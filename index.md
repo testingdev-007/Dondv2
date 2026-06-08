@@ -1,0 +1,1212 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<title>Deal or No Deal</title>  
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+<link rel="preconnect" href="https://fonts.googleapis.com">  
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&display=swap" rel="stylesheet">  
+<style>  
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}  
+  
+:root{  
+  --accent:#FFD700;--glow:rgba(255,215,0,0.28);--dim:rgba(255,215,0,0.07);  
+  --bg:#09090f;--panel:rgba(0,0,0,0.75);--border:rgba(255,255,255,0.07);  
+  --text:#fff;--muted:rgba(255,255,255,0.42);  
+  --darkness: 0; /* Dynamic vignette variable */  
+}  
+body[data-p="showman"]{--accent:#FFD700;--glow:rgba(255,215,0,0.28);--dim:rgba(255,215,0,0.08)}  
+body[data-p="shark"]  {--accent:#FF3344;--glow:rgba(255,51,68,0.28); --dim:rgba(255,51,68,0.07)}  
+body[data-p="analyst"]{--accent:#00DDFF;--glow:rgba(0,221,255,0.22); --dim:rgba(0,221,255,0.06)}  
+body[data-p="goblin"] {--accent:#CC44FF;--glow:rgba(200,68,255,0.25);--dim:rgba(200,68,255,0.07)}  
+  
+body{  
+  background:var(--bg);color:var(--text);  
+  font-family:'Barlow','Segoe UI',system-ui,sans-serif;  
+  min-height:100vh;overflow-x:hidden;-webkit-user-select:none;user-select:none;  
+}  
+/* Dynamic Vignette / Lighting */  
+body::before{  
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;  
+  background:  
+    radial-gradient(ellipse 65% 42% at 50% -8%, rgba(45,28,90,0.8) 0%,transparent 70%),  
+    radial-gradient(ellipse 32% 26% at 10% 68%, rgba(14,32,80,0.3) 0%,transparent 58%),  
+    radial-gradient(ellipse 32% 26% at 90% 68%, rgba(65,14,14,0.2) 0%,transparent 58%),  
+    radial-gradient(ellipse 50% 35% at 50% 55%, rgba(var(--accent-rgb,255,215,0),0.025) 0%,transparent 65%);  
+}  
+body::after {  
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9;  
+  background: radial-gradient(circle, transparent 40%, rgba(0,0,0,var(--darkness)) 100%);  
+  transition: background 1.5s ease;  
+}  
+  
+/* ── HEADER ── */  
+#hd{position:relative;z-index:10;text-align:center;padding:18px 20px 8px}  
+.ttl{  
+  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;  
+  font-size:clamp(36px,8vw,68px);letter-spacing:0.1em;  
+  background:linear-gradient(145deg,#ffe566 0%,#ffd700 32%,#fff6b0 55%,#ffd700 78%,#e0a800 100%);  
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;  
+  filter:drop-shadow(0 0 28px rgba(255,215,0,0.45));line-height:1;  
+}  
+.ttl-sub{font-size:10px;letter-spacing:0.42em;color:rgba(255,255,255,0.26);text-transform:uppercase;margin-top:4px}  
+  
+/* ── CONTROLS ── */  
+#ctrl{  
+  display:flex;align-items:center;justify-content:center;gap:9px;  
+  margin:10px 16px 0;flex-wrap:wrap;position:relative;z-index:10;  
+}  
+.pills{  
+  display:flex;background:rgba(0,0,0,0.52);border:1px solid var(--border);  
+  border-radius:100px;padding:3px;gap:1px;  
+}  
+.pb{  
+  padding:5px 13px;border-radius:100px;border:none;background:transparent;  
+  color:rgba(255,255,255,0.4);font-size:12px;font-weight:700;font-family:inherit;  
+  cursor:pointer;transition:all 0.18s;white-space:nowrap;  
+}  
+.pb:hover{color:rgba(255,255,255,0.75)}  
+.pb.on{background:rgba(255,255,255,0.1);color:#fff}  
+.pb[data-p="showman"].on{background:rgba(255,215,0,0.18);color:#FFD700}  
+.pb[data-p="shark"].on  {background:rgba(255,50,60,0.18); color:#FF7788}  
+.pb[data-p="analyst"].on{background:rgba(0,200,255,0.16); color:#44EEFF}  
+.pb[data-p="goblin"].on {background:rgba(190,60,255,0.18);color:#DD88FF}  
+.cbtn{  
+  padding:6px 14px;border-radius:100px;border:1px solid var(--border);  
+  background:rgba(255,255,255,0.04);color:var(--muted);font-size:12px;font-weight:700;  
+  font-family:inherit;cursor:pointer;transition:all 0.14s;  
+}  
+.cbtn:hover{background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.8)}  
+  
+/* ── STATUS BAR ── */  
+#sb{  
+  position:relative;z-index:10;display:flex;align-items:center;justify-content:center;  
+  gap:14px;padding:7px 18px 3px;font-size:13px;color:var(--muted);flex-wrap:wrap;  
+}  
+#stTxt{font-weight:700;color:var(--text);letter-spacing:0.01em}  
+#evb{  
+  display:flex;align-items:center;gap:5px;  
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);  
+  border-radius:20px;padding:3px 10px 3px 12px;font-size:12px;  
+}  
+#evb b{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:700}  
+.ehbtn{  
+  padding:1px 7px;font-size:11px;border-radius:8px;  
+  border:1px solid rgba(255,255,255,0.12);background:transparent;  
+  color:rgba(255,255,255,0.36);cursor:pointer;font-family:inherit;transition:all 0.13s;  
+}  
+.ehbtn:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}  
+#pips{display:flex;gap:4px;align-items:center}  
+.pip{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.3s}  
+.pip.d{background:var(--accent);box-shadow:0 0 5px var(--glow)}  
+  
+/* ── GAME AREA ── */  
+#ga{  
+  display:grid;grid-template-columns:82px 1fr 82px;gap:10px;  
+  padding:8px 13px;max-width:920px;margin:0 auto;position:relative;z-index:10;  
+}  
+/* Stage spotlight */  
+#ga::before{  
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);  
+  width:70%;height:80%;  
+  background:radial-gradient(ellipse,rgba(255,215,0,0.022) 0%,transparent 68%);  
+  pointer-events:none;  
+}  
+  
+/* ── VALUE BOARDS ── */  
+.vb{display:flex;flex-direction:column;gap:3px}  
+.vi{  
+  padding:3px 4px;text-align:center;font-size:10.5px;font-weight:700;  
+  border-radius:4px;border:1px solid transparent;  
+  transition:all 0.45s ease;font-variant-numeric:tabular-nums;line-height:1.2;  
+}  
+.vi.lo{background:rgba(22,68,180,0.12);border-color:rgba(45,105,255,0.12);color:#88b0f0}  
+.vi.hi{background:rgba(180,52,8,0.12); border-color:rgba(255,85,15,0.12); color:#f0a066}  
+.vi.xx{background:transparent;border-color:transparent;color:rgba(255,255,255,0.1);text-decoration:line-through}  
+  
+/* ── BOX GRID ── */  
+#bg{display:grid;grid-template-columns:repeat(auto-fit, minmax(65px, 1fr)); gap:9px; align-content:start;}  
+  
+/* ── INDIVIDUAL BOX ── */  
+.bwrap{perspective:580px}  
+.bx{  
+  position:relative;height:70px;border-radius:11px;cursor:pointer;  
+  display:flex;align-items:center;justify-content:center;flex-direction:column;  
+  border:1px solid rgba(75,95,215,0.24);  
+  /* Added simulated leather texture */  
+  background:  
+    linear-gradient(162deg,#1b1d38 0%,#101224 50%,#1b1d38 100%),  
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px);  
+  box-shadow:0 3px 12px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.055);  
+  overflow:hidden;transition:transform 0.11s ease,box-shadow 0.18s ease,border-color 0.18s ease;  
+  outline:none;  
+}  
+.bx:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }  
+  
+/* gloss sheen */  
+.bx::before{  
+  content:'';position:absolute;inset:0;border-radius:inherit;  
+  background:linear-gradient(140deg,rgba(255,255,255,0.06) 0%,transparent 42%,rgba(0,0,0,0.14) 100%);  
+  pointer-events:none;  
+}  
+/* briefcase handle/latch upgraded */  
+.bx::after{  
+  content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);  
+  width:40%;height:12px;border:2px solid rgba(100,130,255,0.28);  
+  border-bottom:2px solid rgba(100,130,255,0.15);border-radius:4px 4px 0 0;  
+  transition:all 0.18s;  
+}  
+.bx:hover{  
+  transform:translateY(-3px) scale(1.025);  
+  border-color:rgba(110,140,255,0.52);  
+  box-shadow:0 8px 24px rgba(0,0,0,0.65),0 0 20px rgba(80,105,220,0.14),inset 0 1px 0 rgba(255,255,255,0.1);  
+}  
+.bx:hover::after{border-color:rgba(145,170,255,0.52); top:2px;}  
+  
+/* Player's chosen box */  
+.bx.mine{  
+  border-color:rgba(255,215,0,0.55);  
+  background:linear-gradient(162deg,#2e2200 0%,#1c1500 50%,#2e2200 100%);  
+  box-shadow:0 3px 12px rgba(0,0,0,0.55),0 0 22px rgba(255,215,0,0.18),inset 0 1px 0 rgba(255,255,255,0.08);  
+  cursor:default;  
+}  
+.bx.mine::after{border-color:rgba(255,215,0,0.38)}  
+.bx.mine:hover{transform:none;box-shadow:0 3px 12px rgba(0,0,0,0.55),0 0 22px rgba(255,215,0,0.18),inset 0 1px 0 rgba(255,255,255,0.08)}  
+  
+/* Opened box */  
+.bx.open{  
+  border-color:rgba(255,255,255,0.05);background:rgba(0,0,0,0.32);  
+  box-shadow:inset 0 2px 10px rgba(0,0,0,0.55);cursor:default;  
+}  
+.bx.open::before,.bx.open::after{display:none}  
+.bx.open:hover{transform:none;box-shadow:inset 0 2px 10px rgba(0,0,0,0.55)}  
+  
+.bn{font-size:21px;font-weight:900;color:rgba(255,255,255,0.9);line-height:1;position:relative}  
+.bl{font-size:8px;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.2);margin-top:2px;position:relative}  
+.bv{font-size:12px;font-weight:700;text-align:center;padding:4px 3px;font-variant-numeric:tabular-nums;position:relative;line-height:1.15}  
+  
+/* Suspense Reveal */  
+.bx.suspense-wait .bn { display: block; animation: pulse 0.5s infinite alternate; }  
+.bx.suspense-wait .bl { display: block; }  
+@keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }  
+  
+@keyframes bOpen{  
+  0%  {transform:rotateY(0deg) scale(1)}  
+  33% {transform:rotateY(74deg) scale(1.07)}  
+  63% {transform:rotateY(-14deg) scale(1.04)}  
+  82% {transform:rotateY(5deg) scale(1.01)}  
+  100%{transform:rotateY(0deg) scale(1)}  
+}  
+.bx.flipping{animation:bOpen 0.68s ease-in-out forwards}  
+  
+@keyframes bigGlow{  
+  0%  {box-shadow:0 0 0 rgba(255,110,0,0)}  
+  40% {box-shadow:0 0 55px rgba(255,110,0,0.9),0 0 115px rgba(255,50,0,0.38)}  
+  100%{box-shadow:0 0 24px rgba(255,110,0,0.2)}  
+}  
+.bx.bigwin{animation:bigGlow 0.74s ease-out forwards}  
+  
+/* ── BANKER PANEL ── */  
+#bwrap{position:relative;z-index:10;max-width:840px;margin:6px auto 14px;padding:0 13px}  
+#bp{  
+  background:var(--panel);border:1px solid var(--glow);border-radius:14px;  
+  padding:14px 18px 12px;  
+  box-shadow:0 0 0 1px var(--dim),0 24px 60px rgba(0,0,0,0.72),inset 0 1px 0 rgba(255,255,255,0.04);  
+  display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;  
+  transition:border-color 0.5s,box-shadow 0.5s;  
+}  
+#btit{  
+  font-size:10px;font-weight:900;letter-spacing:0.24em;color:var(--accent);  
+  margin-bottom:7px;display:flex;align-items:center;gap:7px;  
+}  
+.bdot{  
+  width:7px;height:7px;border-radius:50%;background:var(--accent);  
+  box-shadow:0 0 8px var(--glow);flex-shrink:0;  
+}  
+.bicon{font-size:18px;margin-left:2px}  
+#btxt{font-size:15px;line-height:1.58;color:rgba(255,255,255,0.84);min-height:48px;white-space:pre-wrap}  
+  
+#bright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}  
+#olabel{font-size:10px;letter-spacing:0.2em;color:rgba(255,255,255,0.27);text-transform:uppercase;text-align:right}  
+#oamt{  
+  font-family:'Bebas Neue','Impact',sans-serif;font-size:38px;letter-spacing:0.02em;  
+  color:var(--accent);font-variant-numeric:tabular-nums;text-align:right;  
+  min-height:44px;line-height:1.05;filter:drop-shadow(0 0 16px var(--glow));transition:color 0.5s;  
+}  
+#cmeta{font-size:10.5px;color:rgba(255,255,255,0.27);text-align:right;margin-top:-2px}  
+#dbtns{display:flex;gap:7px; flex-wrap:wrap; justify-content: flex-end;}  
+.db{  
+  padding:10px 22px;border:none;border-radius:9px;font-size:13px;font-weight:900;  
+  letter-spacing:0.08em;cursor:pointer;transition:all 0.14s;text-transform:uppercase;  
+  font-family:'Barlow','Segoe UI',sans-serif;  
+}  
+.db:disabled{opacity:0.18;cursor:not-allowed;pointer-events:none}  
+#btnDeal{background:linear-gradient(135deg,#1db855,#167838);color:#fff;box-shadow:0 3px 14px rgba(20,180,80,0.32)}  
+#btnDeal:not(:disabled):hover{background:linear-gradient(135deg,#24cc60,#1a9042);transform:translateY(-1px);box-shadow:0 6px 22px rgba(20,180,80,0.5)}  
+#btnNoDeal{background:linear-gradient(135deg,#cc2020,#8a1212);color:#fff;box-shadow:0 3px 14px rgba(200,30,30,0.32)}  
+#btnNoDeal:not(:disabled):hover{background:linear-gradient(135deg,#dd2828,#9a1414);transform:translateY(-1px);box-shadow:0 6px 22px rgba(200,30,30,0.5)}  
+#btnCounter{background:linear-gradient(135deg,#2244bb,#112277);color:#fff;box-shadow:0 3px 14px rgba(30,60,200,0.32); padding: 10px 14px;}  
+#btnCounter:not(:disabled):hover{background:linear-gradient(135deg,#3355dd,#113399);transform:translateY(-1px);box-shadow:0 6px 22px rgba(30,60,200,0.5)}  
+  
+#ttrack{height:2px;background:rgba(255,255,255,0.05);border-radius:1px;margin-top:7px;overflow:hidden}  
+#tfill{height:100%;width:0%;background:var(--accent);transition:width linear;border-radius:1px}  
+  
+@keyframes bpulse{  
+  0%,100%{  
+    border-color:var(--glow);  
+    box-shadow:0 0 0 1px var(--dim),0 24px 60px rgba(0,0,0,0.72),inset 0 1px 0 rgba(255,255,255,0.04);  
+  }  
+  50%{  
+    border-color:var(--accent);  
+    box-shadow:0 0 0 3px var(--glow),0 0 38px var(--glow),0 24px 60px rgba(0,0,0,0.72),inset 0 1px 0 rgba(255,255,255,0.04);  
+  }  
+}  
+#bp.ring{animation:bpulse 0.75s ease-in-out infinite}  
+  
+/* ── PHONE OVERLAY ── */  
+#phone{  
+  position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-120px);  
+  z-index:100;background:rgba(4,4,10,0.94);border:1px solid rgba(255,255,255,0.12);  
+  border-radius:14px;padding:11px 24px;display:flex;align-items:center;gap:12px;  
+  box-shadow:0 14px 45px rgba(0,0,0,0.85);transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1);  
+  backdrop-filter:blur(12px);pointer-events:none;  
+}  
+#phone.up{transform:translateX(-50%) translateY(0)}  
+#pico{font-size:27px;animation:ringshake 0.32s ease-in-out infinite}  
+@keyframes ringshake{0%,100%{transform:rotate(-13deg)}50%{transform:rotate(13deg)}}  
+#plbl{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:0.06em}  
+  
+/* ── AUDIENCE TOAST ── */  
+#toast{  
+  position:fixed;bottom:130px;left:50%;transform:translateX(-50%) translateY(60px);  
+  z-index:50;background:rgba(0,0,0,0.85);border:1px solid rgba(255,255,255,0.1);  
+  border-radius:30px;padding:8px 22px;font-size:19px;opacity:0;  
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;  
+  backdrop-filter:blur(8px);white-space:nowrap;  
+}  
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}  
+  
+/* ── DIM OVERLAY ── */  
+#dimmer{position:fixed;inset:0;background:transparent;z-index:8;pointer-events:none;transition:background 0.28s}  
+body.calling #dimmer{background:rgba(0,0,0,0.55)}  
+  
+/* ── CONFETTI ── */  
+.cf{position:fixed;pointer-events:none;z-index:999;border-radius:2px;animation:cff linear forwards}  
+@keyframes cff{from{transform:translateY(-20px) rotate(0deg);opacity:1}to{transform:translateY(105vh) rotate(720deg);opacity:0}}  
+  
+/* ── MODALS ── */  
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;padding:18px;z-index:200;backdrop-filter:blur(5px)}  
+.modal.hidden{display:none}  
+.mc{  
+  background:#0e0e18;border:1px solid rgba(255,255,255,0.09);border-radius:18px;  
+  padding:22px;width:min(560px,100%);  
+  box-shadow:0 0 0 1px rgba(255,255,255,0.04),0 32px 80px rgba(0,0,0,0.9);  
+  animation:mpop 0.28s cubic-bezier(0.34,1.56,0.64,1) both;  
+  max-height:88vh;overflow-y:auto;  
+}  
+@keyframes mpop{from{transform:scale(0.9) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}  
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}  
+.mh h2{font-size:19px;font-weight:900;letter-spacing:0.01em}  
+.mx{  
+  width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);  
+  background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);cursor:pointer;  
+  display:grid;place-items:center;font-size:16px;transition:all 0.13s;  
+}  
+.mx:hover{background:rgba(255,255,255,0.1);color:#fff}  
+.kv{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;margin:10px 0}  
+.kr{padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13.5px;font-variant-numeric:tabular-nums;line-height:1.45}  
+.kr:last-child{border-bottom:none}  
+.big-r{text-align:center;font-family:'Bebas Neue','Impact',sans-serif;font-size:38px;letter-spacing:0.04em;margin:14px 0 6px;font-variant-numeric:tabular-nums}  
+.good{color:#55ee66}.bad{color:#ff6655}  
+.mbtns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}  
+.mbtn{padding:10px 22px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.14s}  
+.mbtn:hover{background:rgba(255,255,255,0.1);color:#fff}  
+.mbtn.gold{background:rgba(255,215,0,0.12);border-color:rgba(255,215,0,0.25);color:#FFD700}  
+.mbtn.gold:hover{background:rgba(255,215,0,0.2)}  
+.swap-btns{display:flex;gap:8px;margin-top:14px}  
+.sk{flex:1;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.75);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.14s;text-align:center}  
+.sk:hover{background:rgba(255,255,255,0.1);color:#fff}  
+.sw{flex:1;padding:11px;border-radius:10px;border:1px solid rgba(80,120,255,0.28);background:rgba(40,60,185,0.12);color:#99aaff;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.14s;text-align:center}  
+.sw:hover{background:rgba(40,60,185,0.24)}  
+  
+@media(max-width:580px){  
+  #ga{grid-template-columns:62px 1fr 62px;gap:6px;padding:6px 8px}  
+  .bx{height:56px}.bn{font-size:17px}.bx::after{display:none}  
+  .vi{font-size:9.5px;padding:3px 4px}  
+  #oamt{font-size:28px}#bp{grid-template-columns:1fr}  
+  #bright{align-items:flex-start;flex-direction:row;flex-wrap:wrap}  
+}  
+</style>  
+</head>  
+<body data-p="showman">  
+<div id="dimmer"></div>  
+<div id="phone"><span id="pico">📞</span><span id="plbl">THE BANKER IS CALLING</span></div>  
+<div id="toast"></div>  
+  
+<div id="hd">  
+  <div class="ttl">DEAL OR NO DEAL</div>  
+  <div class="ttl-sub">A Game of Risk &amp; Reward</div>  
+</div>  
+  
+<div id="ctrl">  
+  <div class="pills" id="pills">  
+    <button class="pb on" data-p="showman">🎬 Showman</button>  
+    <button class="pb" data-p="shark">🦈 Predator</button>  
+    <button class="pb" data-p="analyst">🤖 Algorithm</button>  
+    <button class="pb" data-p="goblin">🎲 Chaos</button>  
+  </div>  
+  <button class="cbtn" id="muteBtn" onclick="toggleMute()">🔊</button>  
+  <button class="cbtn" onclick="location.reload()">↺ Restart</button>  
+  <button class="cbtn" onclick="openAnalysis()">📊 Analysis</button>  
+  <button class="cbtn" onclick="openStats()">🏆 Stats</button>  
+</div>  
+  
+<div id="sb" aria-live="polite">  
+  <span id="stTxt">Pick your box to begin.</span>  
+  <div id="evb">EV: <b id="evAmt">—</b> <button class="ehbtn" id="evhBtn">?</button></div>  
+  <div id="pips"></div>  
+</div>  
+  
+<div id="ga">  
+  <div id="vbL" class="vb"></div>  
+  <div id="bg"></div>  
+  <div id="vbR" class="vb"></div>  
+</div>  
+  
+<div id="bwrap">  
+  <div id="bp">  
+    <div id="bleft">  
+      <div id="btit"><span class="bdot"></span> THE BANKER <span class="bicon" id="bico">🎬</span></div>  
+      <div id="btxt" aria-live="polite">Waiting for the game to begin…</div>  
+    </div>  
+    <div id="bright">  
+      <div>  
+        <div id="olabel">OFFER</div>  
+        <div id="oamt" aria-live="polite">—</div>  
+        <div id="cmeta"></div>  
+      </div>  
+      <div id="dbtns">  
+        <button class="db" id="btnCounter" onclick="initiateCounter()" disabled style="display:none">COUNTER</button>  
+        <button class="db" id="btnDeal" onclick="acceptDeal()" disabled>DEAL</button>  
+        <button class="db" id="btnNoDeal" onclick="declineDeal()" disabled>NO DEAL</button>  
+      </div>  
+    </div>  
+  </div>  
+  <div id="ttrack"><div id="tfill"></div></div>  
+</div>  
+  
+<div id="endM" class="modal hidden">  
+  <div class="mc">  
+    <div class="mh"><h2 id="endT">RESULT</h2><button class="mx" onclick="closeM('endM')">×</button></div>  
+    <div id="endB"></div>  
+    <div class="mbtns">  
+      <button class="mbtn gold" onclick="location.reload()">▶ Play Again</button>  
+      <button class="mbtn" onclick="openAnalysis()">📊 Analysis</button>  
+      <button class="mbtn" onclick="openStats()">🏆 Stats</button>  
+    </div>  
+  </div>  
+</div>  
+  
+<div id="evM" class="modal hidden">  
+  <div class="mc">  
+    <div class="mh"><h2>What is EV?</h2><button class="mx" onclick="closeM('evM')">×</button></div>  
+    <div id="evB"></div>  
+  </div>  
+</div>  
+  
+<div id="swapM" class="modal hidden">  
+  <div class="mc">  
+    <div class="mh"><h2>🔀 Final Choice</h2><small style="color:#555">Two boxes remain</small></div>  
+    <div id="swapB"></div>  
+    <div class="swap-btns">  
+      <button class="sk" onclick="finalSwap(false)">Keep My Box</button>  
+      <button class="sw" onclick="finalSwap(true)">Swap Boxes</button>  
+    </div>  
+    <p style="color:#444;font-size:11px;margin-top:10px;">If there's a live offer, use Deal/No Deal first.</p>  
+  </div>  
+</div>  
+  
+<div id="anaM" class="modal hidden">  
+  <div class="mc">  
+    <div class="mh"><h2>📊 Post-Game Analysis</h2><button class="mx" onclick="closeM('anaM')">×</button></div>  
+    <div id="anaB"></div>  
+  </div>  
+</div>  
+  
+<div id="statsM" class="modal hidden">  
+  <div class="mc">  
+    <div class="mh"><h2>🏆 Career Stats</h2><button class="mx" onclick="closeM('statsM')">×</button></div>  
+    <div id="statsB"></div>  
+    <div class="mbtns" style="margin-top:20px;">  
+        <button class="mbtn" onclick="clearStats()" style="border-color:#ff4444; color:#ff4444;">Reset Data</button>  
+    </div>  
+  </div>  
+</div>  
+  
+<script>  
+// ═══════════════════════════════════════════════════  
+//  META-PROGRESSION (LocalStorage)  
+// ═══════════════════════════════════════════════════  
+let userStats = JSON.parse(localStorage.getItem('dondStats')) || {  
+    gamesPlayed: 0,  
+    totalWinnings: 0,  
+    biggestDeal: 0,  
+    winsAgainstBanker: 0 // Times final value > EV  
+};  
+function saveStats() {  
+    localStorage.setItem('dondStats', JSON.stringify(userStats));  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  PERSONAS — Adjusted for 22 Box Format  
+// ═══════════════════════════════════════════════════  
+const PERSONAS = {  
+  showman: {  
+    name:'The Showman', icon:'🎬',  
+    getOffer(ev, boxesLeft, n) {  
+      const prog = 1 - (boxesLeft / 22);  
+      const base = 0.72 + 0.25 * Math.pow(prog, 1.15);  
+      return Math.round(ev * Math.min(1.01, Math.max(0.64, base + rand(-0.04,0.04))));  
+    },  
+    maxCalls:8, plan:[5,3,3,3,3,2,1,1], oppo:false,  
+    pre:["Ladies and gentlemen…","Oooh, this is tense.","The nation is watching.","I've been on the phone…","Breathe. Just breathe.","Right… here we go."],  
+    lead:["Here is the banker's offer:","This is what's on the table:","The number is…","Tonight's offer is:"],  
+    nod:["NO DEAL! The crowd goes wild!","Back to the boxes we go!","Bold. Very bold indeed.","The drama continues!","You love the pressure!"],  
+    rate:0.88, pitch:1.06  
+  },  
+  shark: {  
+    name:'The Predator', icon:'🦈',  
+    getOffer(ev, boxesLeft, n) {  
+      const base = 0.50 + n * 0.032;  
+      return Math.round(ev * Math.min(0.74, Math.max(0.46, base + rand(-0.02,0.05))));  
+    },  
+    maxCalls:10, plan:[5,3,3,3,2,2,1,1,1], oppo:true,  
+    pre:["That hurt, didn't it.","I've been watching very carefully.","Your face says it all.","Another big one, gone.","You're playing with my money now."],  
+    lead:["Here's what I'm offering:","Walk away. Take this.","This is mercy.","The only realistic figure:"],  
+    nod:["Fine. Keep gambling.","I'll still be here.","Predictable.","More boxes. More mistakes.","You can't win them all."],  
+    rate:0.76, pitch:0.7  
+  },  
+  analyst: {  
+    name:'The Algorithm', icon:'🤖',  
+    getOffer(ev, boxesLeft, n) {  
+      return Math.round(ev * (0.88 + Math.random() * 0.07));  
+    },  
+    maxCalls:8, plan:[5,3,3,3,2,2,1,1,1], oppo:false, vTrigger:true,  
+    pre:["Running calculation…","Variance threshold exceeded.","Decision point detected.","Model update complete.","Probability matrix loaded."],  
+    lead:["Expected value output:","Calculated offer:","Statistically justified figure:","Optimal offer:"],  
+    nod:["Suboptimal decision. Noted.","Continuing simulation.","Risk exposure increased.","Data logged. Proceed."],  
+    rate:1.15, pitch:0.88  
+  },  
+  goblin: {  
+    name:'Chaos Goblin', icon:'🎲',  
+    getOffer(ev, boxesLeft, n) {  
+      return Math.round(ev * (0.36 + Math.random() * 1.12));  
+    },  
+    maxCalls:11, plan:[6,4,3,2,2,1,1,1,1], oppo:true, chaos:true,  
+    pre:["I FELT that in my SOUL.","The chaos gods are SCREAMING.","oooOOOOOoooo","BIG energy. BIG.","I've been literally vibrating.","YES YES YES"],  
+    lead:["The number spirits say:","I literally spun a wheel:","The dice have SPOKEN:","Close your eyes and feel… THIS:"],  
+    nod:["YES! FEED THE CHAOS!","Glorious! Unhinged!","I respect the insanity.","RIDE OR DIE!","THE CHAOS GOBLIN IS PLEASED!"],  
+    rate:1.38, pitch:1.55  
+  }  
+};  
+  
+// 22 Values (UK Format)  
+const VALUES=[0.01, 0.1, 0.5, 1, 5, 10, 50, 100, 250, 500, 750, 1000, 3000, 5000, 10000, 15000, 20000, 35000, 50000, 75000, 100000, 250000];  
+const LOW_V =[0.01, 0.1, 0.5, 1, 5, 10, 50, 100, 250, 500, 750];  
+const HIGH_V=[1000, 3000, 5000, 10000, 15000, 20000, 35000, 50000, 75000, 100000, 250000];  
+  
+// ═══════════════════════════════════════════════════  
+//  AUDIO ENGINE  
+// ═══════════════════════════════════════════════════  
+const Snd = (() => {  
+  let ctx,master,sfx,aud,mus,musOn=false,muted=false, hbOsc, hbInterval;  
+  
+  function boot(){  
+    if(ctx){ctx.state==='suspended'&&ctx.resume();return}  
+    ctx=new(window.AudioContext||window.webkitAudioContext)();  
+    master=ctx.createGain();master.gain.value=0.72;master.connect(ctx.destination);  
+    sfx=ctx.createGain();sfx.gain.value=1;sfx.connect(master);  
+    aud=ctx.createGain();aud.gain.value=0.42;aud.connect(master);  
+    mus=ctx.createGain();mus.gain.value=0;mus.connect(master);  
+  }  
+  
+  function t(f,type,vol,dur,t0=0,out){  
+    if(!ctx)return;  
+    const o=ctx.createOscillator(),g=ctx.createGain(),d=out||sfx;  
+    o.type=type;o.frequency.value=f;  
+    const s=ctx.currentTime+t0;  
+    g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(vol,s+0.008);g.gain.exponentialRampToValueAtTime(0.0001,s+dur);  
+    o.connect(g);g.connect(d);o.start(s);o.stop(s+dur+0.02);  
+  }  
+  
+  function noise(dur,cf,q,vol,atk=0.04,loop=false){  
+    if(!ctx)return null;  
+    const sz=Math.ceil(ctx.sampleRate*dur);  
+    const buf=ctx.createBuffer(1,sz,ctx.sampleRate);  
+    const d=buf.getChannelData(0);for(let i=0;i<sz;i++)d[i]=Math.random()*2-1;  
+    const src=ctx.createBufferSource();src.buffer=buf; src.loop=loop;  
+    const flt=ctx.createBiquadFilter();flt.type='bandpass';flt.frequency.value=cf;flt.Q.value=q;  
+    const g=ctx.createGain();  
+    g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(vol,ctx.currentTime+atk);  
+    if(!loop) {  
+        g.gain.setValueAtTime(vol,ctx.currentTime+dur*0.72);g.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);  
+    }  
+    src.connect(flt);flt.connect(g);g.connect(aud);src.start();   
+    if(!loop) src.stop(ctx.currentTime+dur+0.05);  
+    return {src, g};  
+  }  
+  
+  let crowdLoop = null;  
+  
+  return{  
+    boot,  
+    setMute(m){muted=m;if(master)master.gain.value=m?0:0.72},  
+    boxOpen(v){  
+      boot();  
+      if(v>=50000){t(880,'triangle',0.07,0.4);t(1100,'triangle',0.055,0.36,0.04);t(1320,'sine',0.06,0.52,0.1);t(110,'sawtooth',0.04,0.3)}  
+      else if(v>=1000){t(660,'triangle',0.065,0.3);t(880,'triangle',0.046,0.26,0.06)}  
+      else{t(440,'triangle',0.046,0.14);t(550,'triangle',0.03,0.1,0.05)}  
+    },  
+    phone(){  
+      boot();  
+      for(let r=0;r<3;r++){const b=r*0.82;t(478,'square',0.038,0.17,b);t(615,'square',0.038,0.17,b);t(478,'square',0.038,0.17,b+0.22);t(615,'square',0.038,0.17,b+0.22)}  
+    },  
+    offer(){  
+      boot();  
+      t(220,'sawtooth',0.055,0.14);t(196,'sawtooth',0.055,0.14,0.19);t(165,'sawtooth',0.085,0.52,0.38);t(110,'sawtooth',0.042,0.52,0.38);  
+    },  
+    deal(){  
+      boot();  
+      [523,659,784,1047].forEach((f,i)=>t(f,'triangle',0.068,0.28,i*0.115));t(1047,'sine',0.046,0.65,4*0.115);  
+    },  
+    nodeal(){boot();t(220,'sawtooth',0.058,0.19);t(185,'sawtooth',0.058,0.19,0.23);t(147,'sawtooth',0.08,0.4,0.48)},  
+    applause(dur=2.5){boot();noise(dur,2400,0.45,0.32,0.1);noise(dur*0.75,900,0.28,0.14,0.2)},  
+    gasp(s=1){boot();noise(0.55,1800,1.6,0.22*s,0.02);noise(0.72,3200,2,0.14*s,0.06)},  
+    cheer(dur=1.8){  
+      boot();noise(dur,2800,0.38,0.28,0.05);noise(dur*0.65,1400,0.28,0.18,0.15);  
+      if(!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';  
+      o.frequency.setValueAtTime(300,ctx.currentTime);o.frequency.linearRampToValueAtTime(520,ctx.currentTime+0.6);  
+      g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.03,ctx.currentTime+0.1);g.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);  
+      o.connect(g);g.connect(aud);o.start();o.stop(ctx.currentTime+dur);  
+    },  
+    groan(){boot();noise(1.2,400,0.95,0.2,0.08);t(148,'sine',0.028,0.85)},  
+    drumRoll(dur=2.2){  
+      boot();let ti=0,iv=0.052;  
+      while(ti<dur){t(158+(ti/dur)*130,'triangle',0.032,0.038,ti);iv=Math.max(0.018,iv*0.955);ti+=iv}  
+    },  
+    startHeartbeat() {  
+        if(hbInterval || !ctx) return;  
+        hbInterval = setInterval(() => {  
+            t(60, 'sine', 0.25, 0.4);  
+            setTimeout(() => t(65, 'sine', 0.15, 0.3), 200);  
+        }, 1200);  
+    },  
+    stopHeartbeat() {  
+        clearInterval(hbInterval); hbInterval = null;  
+    },  
+    updateCrowd(ev) {  
+        if(!ctx) return;  
+        if(!crowdLoop) crowdLoop = noise(2, 600, 1.0, 0, 1, true); // loop  
+        if(crowdLoop && crowdLoop.g) {  
+            // Volume scales subtly based on EV  
+            let vol = Math.min(0.08, (ev / 50000) * 0.08);  
+            crowdLoop.g.gain.linearRampToValueAtTime(vol, ctx.currentTime + 1);  
+        }  
+    },  
+    startMusic(){  
+      if(musOn)return;boot();musOn=true;  
+      mus.gain.setValueAtTime(0,ctx.currentTime);mus.gain.linearRampToValueAtTime(0.38,ctx.currentTime+2.2);  
+      const chords=[[196,247,294,370],[220,277,330,415],[185,233,277,349],[208,262,311,415]];  
+      let ci=0;  
+      const loop=()=>{  
+        if(!musOn)return;  
+        chords[ci++%chords.length].forEach(f=>{  
+          const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;  
+          g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.015,ctx.currentTime+0.45);  
+          g.gain.setValueAtTime(0.015,ctx.currentTime+2.5);g.gain.linearRampToValueAtTime(0,ctx.currentTime+3.3);  
+          o.connect(g);g.connect(mus);o.start();o.stop(ctx.currentTime+3.4);  
+        });  
+        setTimeout(loop,3100);  
+      };loop();  
+    },  
+    stopMusic(){  
+      musOn=false; this.stopHeartbeat();  
+      if(crowdLoop) { crowdLoop.src.stop(); crowdLoop = null; }  
+      try{if(mus&&ctx){mus.gain.cancelScheduledValues(ctx.currentTime);mus.gain.setValueAtTime(mus.gain.value,ctx.currentTime);mus.gain.linearRampToValueAtTime(0,ctx.currentTime+1.5)}}catch(e){}  
+    },  
+    vib(p){navigator.vibrate&&navigator.vibrate(p)}  
+  };  
+})();  
+  
+// ═══════════════════════════════════════════════════  
+//  SPEECH SYNTHESIS  
+// ═══════════════════════════════════════════════════  
+const Say = (() => {  
+  const sy=window.speechSynthesis; let vv=[];  
+  if(sy){const load=()=>{vv=sy.getVoices()};load();sy.onvoiceschanged=load}  
+  return{  
+    speak(txt,persona){  
+      if(!sy)return;  
+      try{  
+        sy.cancel();const u=new SpeechSynthesisUtterance(txt);const p=PERSONAS[persona];  
+        u.rate=p.rate||1;u.pitch=p.pitch||1;u.volume=0.78;  
+        const en=vv.filter(v=>v.lang.startsWith('en'));  
+        if(en.length)u.voice=en[Math.floor(Math.random()*Math.min(3,en.length))];  
+        sy.speak(u);  
+      }catch(e){}  
+    },  
+    stop(){sy&&sy.cancel()}  
+  };  
+})();  
+  
+// ═══════════════════════════════════════════════════  
+//  GAME STATE  
+// ═══════════════════════════════════════════════════  
+let boxes=[],player=null,opened=0;  
+let offerLive=false,curOffer=null,lastOffer=null,lastEV=null;  
+let ended=false,revLock=false;  
+let roundIdx=0,opensLeft=0,callCt=0,lastCallOpen=0;  
+let finalSt=false,swapPend=false,otherBox=null,roundSat=false,oppoUsed=false;  
+let timerH=null,muteState=false;  
+let counterAvailable = true;  
+const hist=[];  
+let curP='showman';  
+  
+// ═══════════════════════════════════════════════════  
+//  UTILITIES  
+// ═══════════════════════════════════════════════════  
+const $=id=>document.getElementById(id);  
+const fmt=v=>v<1?'£'+v.toFixed(2):'£'+Math.round(v).toLocaleString('en-GB');  
+const rnd=a=>a[Math.floor(Math.random()*a.length)];  
+const rand=(lo,hi)=>lo+Math.random()*(hi-lo);  
+const rem=()=>boxes.map((b,i)=>({b,i})).filter(x=>!x.b.open);  
+const remV=()=>rem().map(x=>x.b.value);  
+const calcEV=()=>{const r=remV();return r.length?r.reduce((s,x)=>s+x,0)/r.length:0};  
+const pers=()=>PERSONAS[curP];  
+const vcol=v=>v>=75000?'#ff5533':v>=15000?'#ff9933':v>=1000?'#ffd700':v>=100?'#88ffaa':v>=10?'#88ccff':'#aaaaaa';  
+  
+function toggleMute(){  
+  muteState=!muteState;Snd.setMute(muteState);$('muteBtn').textContent=muteState?'🔇':'🔊';  
+  if(muteState)Say.stop();  
+}  
+  
+function updateVignette() {  
+    const left = rem().length;  
+    // Darken as boxes decrease  
+    const darkness = 1 - (left / 22);   
+    document.documentElement.style.setProperty('--darkness', Math.min(0.85, darkness * 1.1));  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  INIT  
+// ═══════════════════════════════════════════════════  
+function init(){  
+  boxes=[...VALUES].sort(()=>Math.random()-0.5).map(v=>({value:v,open:false}));  
+  $('bg').innerHTML='';$('vbL').innerHTML='';$('vbR').innerHTML='';  
+  
+  // Value boards  
+  [...LOW_V].reverse().forEach(v=>{  
+    const d=document.createElement('div');d.className='vi lo';d.id='vi'+v;d.textContent=fmt(v);$('vbL').appendChild(d);  
+  });  
+  [...HIGH_V].reverse().forEach(v=>{  
+    const d=document.createElement('div');d.className='vi hi';d.id='vi'+v;d.textContent=fmt(v);$('vbR').appendChild(d);  
+  });  
+  
+  // Boxes (Accessible)  
+  boxes.forEach((b,i)=>{  
+    const w=document.createElement('div');w.className='bwrap';  
+    const el=document.createElement('div');el.className='bx';  
+    el.tabIndex = 0; // Accessibility  
+    el.innerHTML=`<span class="bn">${i+1}</span><span class="bl">BOX</span>`;  
+    el.onclick=()=>clickBox(i,el);  
+    el.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' ') clickBox(i,el)};  
+    w.appendChild(el);$('bg').appendChild(w);  
+  });  
+  
+  player=null;opened=0;offerLive=false;curOffer=null;lastOffer=null;lastEV=null;  
+  ended=false;revLock=false;roundIdx=0;opensLeft=0;callCt=0;lastCallOpen=0;  
+  finalSt=false;swapPend=false;otherBox=null;roundSat=false;oppoUsed=false;hist.length=0;  
+  counterAvailable = true; $('btnCounter').style.display='none';  
+    
+  $('btnDeal').disabled=true;$('btnNoDeal').disabled=true;  
+  $('oamt').textContent='—';$('cmeta').textContent='';$('btxt').textContent='Waiting for the game to begin…';  
+  $('evAmt').textContent='—';$('stTxt').textContent='Pick your box to begin.';  
+  $('pips').innerHTML='';$('tfill').style.width='0%';  
+  document.body.dataset.p=curP;  
+  updateVignette();  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  PERSONA SWITCH  
+// ═══════════════════════════════════════════════════  
+$('pills').addEventListener('click',e=>{  
+  const b=e.target.closest('.pb');if(!b||player!==null)return;  
+  const p=b.dataset.p;if(!p)return;  
+  curP=p;document.body.dataset.p=p;  
+  document.querySelectorAll('.pb').forEach(x=>x.classList.toggle('on',x.dataset.p===p));  
+  const pe=PERSONAS[p];$('bico').textContent=pe.icon;  
+  $('btxt').textContent=`${pe.icon} ${pe.name} is ready. Pick a box.`;  
+});  
+  
+// ═══════════════════════════════════════════════════  
+//  ROUND MANAGEMENT  
+// ═══════════════════════════════════════════════════  
+function startRound(){  
+  const plan=pers().plan;  
+  opensLeft=plan[Math.min(roundIdx,plan.length-1)];  
+  roundIdx++;roundSat=false;oppoUsed=false;  
+  $('stTxt').textContent=`Round ${roundIdx} · Open ${opensLeft} box${opensLeft>1?'es':''}`;  
+  drawPips();  
+}  
+  
+function drawPips(){  
+  $('pips').innerHTML='';  
+  const total=pers().plan[Math.min(roundIdx-1,pers().plan.length-1)]||1;  
+  const done=total-opensLeft;  
+  for(let i=0;i<total;i++){const pip=document.createElement('span');pip.className='pip'+(i<done?' d':'');$('pips').appendChild(pip)}  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  BOX CLICK & REVEAL  
+// ═══════════════════════════════════════════════════  
+function clickBox(i,el){  
+  if(offerLive||ended||swapPend||finalSt)return;  
+  if(boxes[i].open)return;  
+  if(player!==null&&i===player)return;  
+  
+  Snd.boot();Snd.startMusic();  
+  
+  // Choose player's box  
+  if(player===null){  
+    player=i;  
+    el.classList.add('mine');  
+    el.innerHTML=`<span class="bn">${i+1}</span><span class="bl" style="color:rgba(255,215,0,0.45)">YOURS</span>`;  
+    document.querySelectorAll('.pb').forEach(b=>b.disabled=true);  
+    startRound();Snd.vib(30);  
+    $('btxt').textContent=`📦 Box ${i+1} is yours. Let's play.`;  
+    return;  
+  }  
+  if(opensLeft<=0)return;  
+  
+  const evBef=calcEV(),maxBef=Math.max(...remV());  
+  boxes[i].open=true;opened++;opensLeft--;  
+  drawPips();  
+  
+  // Strike value board  
+  const vEl=$('vi'+boxes[i].value);if(vEl)vEl.classList.add('xx');  
+  
+  // Flip animation  
+  el.classList.add('flipping');  
+  Snd.boxOpen(boxes[i].value);Snd.vib(42);  
+  
+  const val = boxes[i].value;  
+  const col = vcol(val);  
+    
+  // High-value suspense mechanic  
+  if(val >= 50000) {  
+      el.classList.add('suspense-wait');  
+      el.innerHTML = `<span class="bn">...</span><span class="bl">WAIT</span>`;  
+      Snd.drumRoll(2); // Audio tension  
+      setTimeout(() => finalizeReveal(el, val, col, evBef, maxBef), 2200);  
+  } else {  
+      setTimeout(() => finalizeReveal(el, val, col, evBef, maxBef), 500);  
+  }  
+}  
+  
+function finalizeReveal(el, val, col, evBef, maxBef) {  
+    el.classList.remove('flipping', 'suspense-wait'); el.classList.add('open');  
+    el.innerHTML=`<div class="bv" style="color:${col}">${fmt(val)}</div>`;  
+  
+    if(val>=50000){el.classList.add('bigwin');react('big-gasp')}  
+    else if(val>=10000)react('gasp');  
+    else if(val<=1)react('cheer');  
+  
+    const evAft=calcEV();  
+    $('evAmt').textContent=fmt(evAft);  
+    updateVignette();  
+    Snd.updateCrowd(evAft);  
+  
+    // Heartbeat logic  
+    if(rem().length <= 5 || evAft > 20000) Snd.startHeartbeat();  
+    else Snd.stopHeartbeat();  
+  
+    // Persona triggers  
+    sharkTrig(maxBef,val);  
+    goblinTrig(evBef,evAft,val);  
+    analystTrig();  
+  
+    if(opensLeft<=0){  
+      if(!offerLive&&!roundSat){  
+        setTimeout(()=>bankerCall('scheduled',`End of Round ${roundIdx}`),680);  
+        roundSat=true;  
+      }  
+      if(rem().length>2)startRound();  
+    }  
+  
+    const rr=rem().map(x=>x.i);  
+    if(rr.length===2)enterFinal(rr);  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  AUDIENCE REACTIONS  
+// ═══════════════════════════════════════════════════  
+const REACTS={  
+  'big-gasp':{txt:'😱 OHHHH!',   fn:()=>{Snd.gasp(1.5);setTimeout(()=>Snd.applause(1.6),350)}},  
+  'gasp':    {txt:'😮 Ooooh…',   fn:()=>Snd.gasp(0.9)},  
+  'cheer':   {txt:'🎉 Yeahhhh!', fn:()=>Snd.cheer(1.7)},  
+  'applause':{txt:'👏 Bravo!!',  fn:()=>Snd.applause(3.2)},  
+  'groan':   {txt:'😬 Ohhhh…',   fn:()=>Snd.groan()},  
+};  
+let toastT;  
+function react(type){  
+  const r=REACTS[type];if(!r)return;r.fn();  
+  $('toast').textContent=r.txt;$('toast').classList.add('show');  
+  clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('show'),2300);  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  OPPORTUNISTIC TRIGGERS  
+// ═══════════════════════════════════════════════════  
+function sharkTrig(maxBef,val){  
+  if(curP!=='shark'||offerLive||finalSt||oppoUsed||callCt>=pers().maxCalls)return;  
+  if(rem().length<=5||opened-lastCallOpen<2)return;  
+  if(val===maxBef){oppoUsed=true;setTimeout(()=>bankerCall('opportunistic',`Top prize eliminated: ${fmt(val)}`),920)}  
+}  
+function goblinTrig(evB,evA,val){  
+  if(curP!=='goblin'||offerLive||finalSt||oppoUsed||callCt>=pers().maxCalls)return;  
+  if(rem().length<=5||opened-lastCallOpen<2)return;  
+  const drop=evB-evA,pct=evB>0?drop/evB:0,n=rem().length;  
+  if(pct>=(n>10?0.13:0.10)||drop>=(n>10?7000:4500)){  
+    oppoUsed=true;setTimeout(()=>bankerCall('opportunistic',`EV crashed −${fmt(drop)}`),920);  
+  }  
+}  
+function analystTrig(){  
+  if(curP!=='analyst'||offerLive||finalSt||oppoUsed||callCt>=pers().maxCalls)return;  
+  if(rem().length<=5||opened-lastCallOpen<3)return;  
+  const vals=remV(),mean=calcEV();  
+  const cv=Math.sqrt(vals.reduce((s,v)=>s+Math.pow(v-mean,2),0)/vals.length)/mean;  
+  if(cv>1.2){oppoUsed=true;setTimeout(()=>bankerCall('opportunistic','High variance detected'),920)}  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  BANKER CALL  
+// ═══════════════════════════════════════════════════  
+function bankerCall(type,reason){  
+  if(ended||player===null||offerLive)return;  
+  if(type!=='final'&&finalSt)return;  
+  const p=pers();if(callCt>=p.maxCalls)return;  
+  const boxesL=rem().length;  
+  if(type==='scheduled'){const cd=boxesL>10?3:2;if(opened-lastCallOpen<cd)return}  
+  
+  // Lock  
+  offerLive=true;  
+  const e=calcEV();lastEV=e;  
+  const offer=p.getOffer(e,boxesL,callCt);  
+  curOffer=offer;lastOffer=offer;callCt++;lastCallOpen=opened;  
+  if(type==='scheduled')roundSat=true;  
+  hist.push({callNo:callCt,type,reason,persona:curP,boxesL,ev:e,offer,decision:'(pending)'});  
+  
+  // Phase 1 — Phone rings  
+  $('phone').classList.add('up');  
+  document.body.classList.add('calling');  
+  $('bp').classList.add('ring');  
+  Snd.phone();Snd.vib([110,55,110,55,110]);  
+  
+  const preMsg=rnd(p.pre)+'\n'+rnd(p.lead);  
+  
+  setTimeout(()=>{  
+    $('phone').classList.remove('up');  
+    $('btxt').textContent=preMsg;  
+    Say.speak(preMsg,curP);  
+  
+    // Phase 2 — Offer reveals  
+    setTimeout(()=>{  
+      $('oamt').textContent='—';  
+      Snd.offer();  
+      animOffer(offer);  
+      const itypes={scheduled:'⏱ Scheduled',opportunistic:'🧠 Triggered',final:'⚡ Final'};  
+      $('cmeta').textContent=`${itypes[type]||'📞'} — ${reason} — ${boxesL} boxes`;  
+      $('evAmt').textContent=fmt(e);  
+        
+      $('btnDeal').disabled=false;$('btnNoDeal').disabled=false;  
+      if(counterAvailable) { $('btnCounter').style.display='inline-block'; $('btnCounter').disabled=false; }  
+        
+      startTimer();  
+      $('bp').classList.remove('ring');  
+      document.body.classList.remove('calling');  
+      Snd.vib([55,28,55]);  
+    },960);  
+  },1950);  
+}  
+  
+function animOffer(target,ms=1380){  
+  $('oamt').textContent='Calculating…';  
+  const t0=performance.now();  
+  const tick=now=>{  
+    const prog=Math.min(1,(now-t0)/ms);  
+    const e=1-Math.pow(1-prog,3);  
+    $('oamt').textContent=fmt(Math.round(target*e));  
+    if(prog<1)requestAnimationFrame(tick);else $('oamt').textContent=fmt(target);  
+  };requestAnimationFrame(tick);  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  TIMER & RESET  
+// ═══════════════════════════════════════════════════  
+function startTimer(ms=15000){ // slightly longer for Counter mechanics  
+  const f=$('tfill');f.style.transition='none';f.style.width='0%';  
+  f.offsetWidth; // reflow  
+  f.style.transition=`width ${ms}ms linear`;f.style.width='100%';  
+  clearTimeout(timerH);  
+  timerH=setTimeout(()=>{  
+    $('btxt').textContent='The banker is still waiting for your answer…';  
+    $('cmeta').textContent='⌛ Time pressure elapsed';  
+  },ms);  
+}  
+function stopTimer(){  
+  clearTimeout(timerH);const f=$('tfill');f.style.transition='none';f.style.width='0%';  
+}  
+function resetBanker(){  
+  offerLive=false;curOffer=null;  
+  $('btnDeal').disabled=true;$('btnNoDeal').disabled=true;  
+  if($('btnCounter')) $('btnCounter').disabled=true;  
+  $('oamt').textContent='—';$('cmeta').textContent='';  
+  $('bp').classList.remove('ring');document.body.classList.remove('calling');  
+  stopTimer();  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  DEAL / NO DEAL / COUNTER  
+// ═══════════════════════════════════════════════════  
+function acceptDeal(){  
+  if(ended||!offerLive)return;  
+  resetBanker();Say.stop();  
+  Snd.deal();Snd.applause(3.8);Snd.vib([50,28,50,28,90]);react('applause');  
+  const last=hist[hist.length-1];if(last&&last.decision==='(pending)')last.decision='DEAL';  
+  setTimeout(()=>endDeal(curOffer||lastOffer),600);  
+}  
+function declineDeal(){  
+  if(ended||!offerLive)return;  
+  resetBanker();Say.stop();  
+  Snd.nodeal();Snd.cheer(1.6);Snd.vib(72);react('cheer');  
+  const last=hist[hist.length-1];if(last&&last.decision==='(pending)')last.decision='NO DEAL';  
+  const nd=rnd(pers().nod);$('btxt').textContent=nd;Say.speak(nd,curP);  
+  if(finalSt&&!swapPend)setTimeout(showSwap,950);  
+}  
+  
+function initiateCounter() {  
+    if(ended||!offerLive||!counterAvailable)return;  
+    const req = prompt("Make your counter-offer to the Banker (numbers only):");  
+    if(req === null || req.trim() === "") return; // cancelled  
+      
+    const amount = parseInt(req.replace(/[^0-9]/g, ''), 10);  
+    if(isNaN(amount) || amount <= 0) {  
+        alert("Invalid amount."); return;  
+    }  
+      
+    counterAvailable = false;  
+    $('btnCounter').style.display='none';  
+    stopTimer();  
+      
+    $('btxt').textContent = `You requested ${fmt(amount)}. The Banker is considering...`;  
+    $('bp').classList.add('ring');  
+    Snd.phone(); Snd.drumRoll(2);  
+      
+    setTimeout(() => {  
+        $('bp').classList.remove('ring');  
+        // Banker Logic: Accepts if counter is <= 110% of their actual secret max offer, or <= 100% of EV  
+        const p = pers();  
+        const ev = lastEV || calcEV();  
+        const maxThreshold = Math.max(ev * 1.0, (curOffer||lastOffer) * 1.15); // Will go up to 15% above current offer  
+          
+        if(amount <= maxThreshold) {  
+            $('btxt').textContent = `The Banker says... DEAL. They accepted your counter-offer!`;  
+            Say.speak("Deal.", curP);  
+            curOffer = amount;  
+            acceptDeal();  
+        } else {  
+            $('btxt').textContent = `The Banker says NO DEAL. They rejected ${fmt(amount)}.`;  
+            Say.speak("Absolutely not.", curP);  
+            react('groan');  
+            startTimer(); // resume waiting for regular decision  
+        }  
+    }, 2500);  
+}  
+  
+  
+// ═══════════════════════════════════════════════════  
+//  FINAL STAGE  
+// ═══════════════════════════════════════════════════  
+function enterFinal(twoIdx){  
+  finalSt=true;  
+  otherBox=twoIdx[0]===player?twoIdx[1]:twoIdx[0];  
+  $('stTxt').textContent='Final stage · Two boxes remain';  
+  const canCall=!offerLive&&callCt<pers().maxCalls;  
+  if(canCall){  
+    setTimeout(()=>{  
+      bankerCall('final','Two boxes left');  
+      if(!offerLive)setTimeout(showSwap,450);  
+    },720);  
+  }else{  
+    setTimeout(showSwap,720);  
+  }  
+}  
+  
+function showSwap(){  
+  swapPend=true;const e=lastEV??calcEV();  
+  $('swapB').innerHTML=`  
+    <div class="kv">  
+      <div class="kr"><b>Your box:</b> #${player+1}</div>  
+      <div class="kr"><b>Other box:</b> #${otherBox+1}</div>  
+      <div class="kr"><b>EV right now:</b> ${fmt(e)}</div>  
+      <div class="kr" style="color:#555;font-size:12px;">Statistically, in many configurations, swapping increases your chance of a bigger prize.</div>  
+    </div>`;  
+  $('swapM').classList.remove('hidden');  
+}  
+  
+function finalSwap(doSwap){  
+  if(ended||revLock)return;revLock=true;  
+  $('swapM').classList.add('hidden');  
+  const fi=doSwap?otherBox:player;  
+  const fv=boxes[fi].value,ov=boxes[doSwap?player:otherBox].value;  
+  Snd.drumRoll(2.3);  
+  $('btxt').textContent='…the final box opens…';$('cmeta').textContent='🎬 Final reveal';  
+  setTimeout(()=>{  
+    revLock=false;Snd.offer();  
+    react(fv>=50000?'big-gasp':fv>=10000?'gasp':'cheer');  
+    endNoDeal(doSwap,fi,fv,ov,lastOffer||0);  
+  },2400);  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  END GAME & STATS SAVING  
+// ═══════════════════════════════════════════════════  
+function recordGameStats(winnings, isWin) {  
+    userStats.gamesPlayed++;  
+    userStats.totalWinnings += winnings;  
+    if(winnings > userStats.biggestDeal) userStats.biggestDeal = winnings;  
+    if(isWin) userStats.winsAgainstBanker++;  
+    saveStats();  
+}  
+  
+function endDeal(deal){  
+  ended=true;$('btnDeal').disabled=true;$('btnNoDeal').disabled=true;offerLive=false;  
+  Snd.stopMusic();  
+  const bv=boxes[player].value,e=lastEV??calcEV(),d=Math.round(deal-e);  
+  const pct=e?Math.round(deal/e*100):null,good=deal>=bv;  
+    
+  recordGameStats(deal, good); // Save stats  
+  
+  if(good){confetti();react('applause')}else react('groan');  
+  $('endT').textContent='🤝 DEAL ACCEPTED';  
+  $('endB').innerHTML=`  
+    <div class="big-r ${good?'good':'bad'}">${fmt(deal)}</div>  
+    <div class="kv">  
+      <div class="kr"><b>You accepted:</b> ${fmt(deal)}</div>  
+      <div class="kr"><b>Box contained:</b> ${fmt(bv)}</div>  
+      <div class="kr"><b>EV at last call:</b> ${fmt(e)}</div>  
+      <div class="kr"><b>Offer vs EV:</b> ${pct??'—'}% (${fmt(Math.abs(d))} ${d>=0?'above':'below'})</div>  
+    </div>  
+    <p class="${good?'good':'bad'}" style="margin-top:12px;">${good?'🏆 Great call — you outperformed your box!':'😬 Bad luck — the banker got the better deal.'}</p>`;  
+  $('endM').classList.remove('hidden');  
+}  
+  
+function endNoDeal(swapped,fi,fv,ov,lo){  
+  ended=true;$('btnDeal').disabled=true;$('btnNoDeal').disabled=true;offerLive=false;  
+  Snd.stopMusic();  
+  const e=lastEV??calcEV(),d=Math.round(fv-e),good=fv>=ov;  
+    
+  recordGameStats(fv, fv > lo); // Save stats  
+  
+  if(good){confetti();react('applause')}else react('groan');  
+  $('endT').textContent='🔥 NO DEAL';  
+  $('endB').innerHTML=`  
+    <div class="big-r ${good?'good':'bad'}">${fmt(fv)}</div>  
+    <div class="kv">  
+      <div class="kr"><b>Decision:</b> ${swapped?'SWAPPED 🔀':'KEPT your box'}</div>  
+      <div class="kr"><b>Final box #${fi+1}:</b> ${fmt(fv)}</div>  
+      <div class="kr"><b>Other box:</b> ${fmt(ov)}</div>  
+      <div class="kr"><b>Last offer:</b> ${lo?fmt(lo):'—'}</div>  
+      <div class="kr"><b>Outcome vs EV:</b> ${fmt(Math.abs(d))} ${d>=0?'above':'below'} EV</div>  
+    </div>  
+    <p class="${good?'good':'bad'}" style="margin-top:12px;">${good?'🎉 Fearless! You backed yourself and won!':'😔 That stings… but you went for glory.'}</p>`;  
+  $('endM').classList.remove('hidden');  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  CONFETTI  
+// ═══════════════════════════════════════════════════  
+function confetti(){  
+  const cols=['#FFD700','#FF6633','#55FF66','#66AAFF','#FF55FF','#FF9900'];  
+  for(let i=0;i<62;i++){  
+    const el=document.createElement('div');el.className='cf';  
+    const size=6+Math.random()*9;  
+    el.style.cssText=`left:${Math.random()*100}vw;top:-22px;background:${cols[i%cols.length]};width:${size}px;height:${size}px;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*0.65}s;border-radius:${Math.random()>0.5?'50%':'2px'}`;  
+    document.body.appendChild(el);setTimeout(()=>el.remove(),5e3);  
+  }  
+}  
+  
+// ═══════════════════════════════════════════════════  
+//  MODALS & HELPERS  
+// ═══════════════════════════════════════════════════  
+$('evhBtn').addEventListener('click',()=>{  
+  const r=remV(),sum=r.reduce((a,b)=>a+b,0),avg=r.length?sum/r.length:0;  
+  $('evB').innerHTML=`  
+    <p><b>EV</b> = <b>Expected Value</b>. The average prize you'd win if you replayed this exact situation many times.</p>  
+    <div class="kv">  
+      <div class="kr"><b>Formula:</b> sum of remaining prizes ÷ number of boxes</div>  
+      <div class="kr"><b>Right now:</b> ${fmt(sum)} ÷ ${r.length} = <b>${fmt(avg)}</b></div>  
+    </div>  
+    <p style="color:#777;margin-top:10px;">Offer <b style="color:#55ee66">above EV</b> → statistically smart to accept.<br>  
+    Offer <b style="color:#ff6655">below EV</b> → you're buying certainty by taking a discount on average.</p>`;  
+  $('evM').classList.remove('hidden');  
+});  
+  
+function openAnalysis(){  
+  const p=pers();  
+  let html=`<div class="kv">  
+    <div class="kr"><b>Banker:</b> ${p.icon} ${p.name}</div>  
+    <div class="kr"><b>Round plan:</b> [${p.plan.join(', ')}]</div>  
+    <div class="kr"><b>Calls:</b> ${callCt}/${p.maxCalls} · Boxes opened: ${opened} / ${VALUES.length}</div>  
+  </div>`;  
+  if(hist.length){  
+    html+=`<div class="kv"><div class="kr" style="font-weight:700">Banker Call Log:</div>`;  
+    hist.forEach(h=>{  
+      const pct=h.ev?Math.round(h.offer/h.ev*100):null;  
+      html+=`<div class="kr">#${h.callNo} <b>${h.type.toUpperCase()}</b> — ${h.reason}<br>EV ${fmt(h.ev)} → Offer ${fmt(h.offer)} ${pct?`(${pct}% of EV)`:''} → <b>${h.decision}</b></div>`;  
+    });  
+    html+=`</div>`;  
+  }else html+=`<p style="color:#555;margin-top:10px">No banker calls yet.</p>`;  
+  $('anaB').innerHTML=html;$('anaM').classList.remove('hidden');  
+}  
+  
+function openStats() {  
+    let winRate = userStats.gamesPlayed > 0 ? Math.round((userStats.winsAgainstBanker / userStats.gamesPlayed) * 100) : 0;  
+    $('statsB').innerHTML = `  
+        <div class="kv">  
+            <div class="kr"><b>Games Played:</b> ${userStats.gamesPlayed}</div>  
+            <div class="kr"><b>Total Winnings:</b> ${fmt(userStats.totalWinnings)}</div>  
+            <div class="kr"><b>Biggest Deal/Win:</b> ${fmt(userStats.biggestDeal)}</div>  
+            <div class="kr"><b>Win Rate (Beat Banker):</b> ${winRate}%</div>  
+        </div>  
+    `;  
+    $('statsM').classList.remove('hidden');  
+}  
+  
+function clearStats() {  
+    if(confirm("Are you sure you want to reset all your career stats?")) {  
+        userStats = { gamesPlayed: 0, totalWinnings: 0, biggestDeal: 0, winsAgainstBanker: 0 };  
+        saveStats(); openStats();  
+    }  
+}  
+  
+function closeM(id){$(id).classList.add('hidden')}  
+document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden')})});  
+  
+// ═══════════════════════════════════════════════════  
+//  GO  
+// ═══════════════════════════════════════════════════  
+init();  
+</script>  
+</body>  
+</html>  
