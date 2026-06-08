@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Deal or No Deal</title>
+<title>Deal or No Deal - Live Studio Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -11,9 +11,9 @@
 
 :root{
   --accent:#FFD700;--glow:rgba(255,215,0,0.28);--dim:rgba(255,215,0,0.07);
-  --bg:#09090f;--panel:rgba(0,0,0,0.75);--border:rgba(255,255,255,0.07);
-  --text:#fff;--muted:rgba(255,255,255,0.42);
-  --darkness: 0;
+  --bg:#07070d;--panel:rgba(10,11,22,0.85);--border:rgba(255,255,255,0.08);
+  --text:#fff;--muted:rgba(255,255,255,0.45);
+  --darkness: 0.2;
 }
 body[data-p="showman"]{--accent:#FFD700;--glow:rgba(255,215,0,0.28);--dim:rgba(255,215,0,0.08)}
 body[data-p="shark"]  {--accent:#FF3344;--glow:rgba(255,51,68,0.28); --dim:rgba(255,51,68,0.07)}
@@ -24,335 +24,337 @@ body{
   background:var(--bg);color:var(--text);
   font-family:'Barlow','Segoe UI',system-ui,sans-serif;
   min-height:100vh;overflow-x:hidden;-webkit-user-select:none;user-select:none;
+  position: relative;
 }
+
+/* Studio Stage Ambient Background */
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:
-    radial-gradient(ellipse 65% 42% at 50% -8%, rgba(45,28,90,0.8) 0%,transparent 70%),
-    radial-gradient(ellipse 32% 26% at 10% 68%, rgba(14,32,80,0.3) 0%,transparent 58%),
-    radial-gradient(ellipse 32% 26% at 90% 68%, rgba(65,14,14,0.2) 0%,transparent 58%),
-    radial-gradient(ellipse 50% 35% at 50% 55%, rgba(var(--accent-rgb,255,215,0),0.025) 0%,transparent 65%);
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(35,40,110,0.6) 0%,transparent 70%),
+    radial-gradient(circle at 15% 75%, rgba(15,20,70,0.45) 0%,transparent 50%),
+    radial-gradient(circle at 85% 75%, rgba(60,15,15,0.3) 0%,transparent 50%);
 }
 body::after {
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:9;
-  background: radial-gradient(circle, transparent 40%, rgba(0,0,0,var(--darkness)) 100%);
-  transition: background 1.5s ease;
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:3;
+  background: radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,var(--darkness)) 100%);
+  transition: background 1s ease;
 }
 
-/* Studio Lightning Alert Flash */
-#flashOverlay {
-  position: fixed; inset: 0; pointer-events: none; z-index: 99; opacity: 0; background: #ff2233;
-  transition: opacity 0.1s ease-out;
+/* Studio Decorative Neon Pillars */
+.neon-pillar {
+  position: fixed; top: 0; width: 4px; height: 100vh; z-index: 1; pointer-events: none; opacity: 0.25;
+  background: var(--accent); box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent);
+  transition: background 0.5s, box-shadow 0.5s, opacity 0.5s;
 }
-#flashOverlay.hit { opacity: 0.35; transition: none; }
+#leftPillar { left: 20px; }
+#rightPillar { right: 20px; }
+
+/* Dynamic flash layer for premium impact */
+#flashOverlay {
+  position: fixed; inset: 0; pointer-events: none; z-index: 99; opacity: 0; background: #fff;
+}
+#flashOverlay.flash-red { background: #ff2233; animation: flashTrigger 0.5s ease-out forwards; }
+#flashOverlay.flash-blue { background: #2266ff; animation: flashTrigger 0.5s ease-out forwards; }
+@keyframes flashTrigger { 0% { opacity: 0.45; } 100% { opacity: 0; } }
 
 /* ── HEADER ── */
-#hd{position:relative;z-index:10;text-align:center;padding:18px 20px 8px}
+#hd{position:relative;z-index:10;text-align:center;padding:24px 20px 10px}
 .ttl{
-  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;
-  font-size:clamp(36px,8vw,68px);letter-spacing:0.1em;
-  background:linear-gradient(145deg,#ffe566 0%,#ffd700 32%,#fff6b0 55%,#ffd700 78%,#e0a800 100%);
+  font-family:'Bebas Neue','Impact',sans-serif;
+  font-size:clamp(42px,7vw,76px);letter-spacing:0.08em;
+  background:linear-gradient(180deg,#fff4aa 0%,#ffd700 45%,#d89600 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  filter:drop-shadow(0 0 28px rgba(255,215,0,0.45));line-height:1;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,0.6)) drop-shadow(0 0 32px rgba(255,215,0,0.3));
+  line-height:0.95;
 }
-.ttl-sub{font-size:10px;letter-spacing:0.42em;color:rgba(255,255,255,0.26);text-transform:uppercase;margin-top:4px}
+.ttl-sub{font-size:11px;letter-spacing:0.45em;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:6px;font-weight:700}
 
-/* ── CONTROLS ── */
+/* ── CONTROLS & BAR ── */
 #ctrl{
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  margin:10px 16px 0;flex-wrap:wrap;position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin:12px 16px 0;flex-wrap:wrap;position:relative;z-index:10;
 }
 .pills{
-  display:flex;background:rgba(0,0,0,0.52);border:1px solid var(--border);
-  border-radius:100px;padding:3px;gap:1px;
+  display:flex;background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.1);
+  border-radius:100px;padding:4px;gap:2px;box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 .pb{
-  padding:5px 13px;border-radius:100px;border:none;background:transparent;
-  color:rgba(255,255,255,0.4);font-size:12px;font-weight:700;font-family:inherit;
-  cursor:pointer;transition:all 0.18s;white-space:nowrap;
+  padding:6px 14px;border-radius:100px;border:none;background:transparent;
+  color:rgba(255,255,255,0.45);font-size:12px;font-weight:700;font-family:inherit;
+  cursor:pointer;transition:all 0.2s ease;white-space:nowrap;
 }
-.pb:hover{color:rgba(255,255,255,0.75)}
-.pb.on{background:rgba(255,255,255,0.1);color:#fff}
-.pb[data-p="showman"].on{background:rgba(255,215,0,0.18);color:#FFD700}
-.pb[data-p="shark"].on  {background:rgba(255,50,60,0.18); color:#FF7788}
-.pb[data-p="analyst"].on{background:rgba(0,200,255,0.16); color:#44EEFF}
-.pb[data-p="goblin"].on {background:rgba(190,60,255,0.18);color:#DD88FF}
+.pb:hover{color:#fff}
+.pb.on{background:rgba(255,255,255,0.12);color:#fff}
+.pb[data-p="showman"].on{background:rgba(255,215,0,0.22);color:#FFD700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.pb[data-p="shark"].on  {background:rgba(255,51,68,0.22); color:#FF5566;text-shadow:0 0 8px rgba(255,51,68,0.4)}
+.pb[data-p="analyst"].on{background:rgba(0,221,255,0.18); color:#33E4FF;text-shadow:0 0 8px rgba(0,221,255,0.4)}
+.pb[data-p="goblin"].on {background:rgba(200,68,255,0.22);color:#D466FF;text-shadow:0 0 8px rgba(200,68,255,0.4)}
+
 .cbtn{
-  padding:6px 14px;border-radius:100px;border:1px solid var(--border);
-  background:rgba(255,255,255,0.04);color:var(--muted);font-size:12px;font-weight:700;
-  font-family:inherit;cursor:pointer;transition:all 0.14s;
+  padding:7px 16px;border-radius:100px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
-.cbtn:hover{background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.8)}
+.cbtn:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2)}
+.cbtn.restart-btn {
+  background:rgba(255,68,68,0.15); border-color:rgba(255,68,68,0.25); color:#ff9999;
+}
+.cbtn.restart-btn:hover {
+  background:rgba(255,68,68,0.25); border-color:rgba(255,68,68,0.4); color:#fff;
+}
 
 /* ── STATUS BAR ── */
 #sb{
   position:relative;z-index:10;display:flex;align-items:center;justify-content:center;
-  gap:14px;padding:7px 18px 3px;font-size:13px;color:var(--muted);flex-wrap:wrap;
+  gap:16px;padding:12px 24px 6px;font-size:14px;color:rgba(255,255,255,0.6);flex-wrap:wrap;
 }
-#stTxt{font-weight:700;color:var(--text);letter-spacing:0.01em}
+#stTxt{font-weight:700;color:#fff;letter-spacing:0.02em;text-shadow:0 2px 4px rgba(0,0,0,0.5)}
 #evb{
-  display:flex;align-items:center;gap:5px;
-  background:rgba(255,255,255,0.04);border:1px solid var(--border);
-  border-radius:20px;padding:3px 10px 3px 12px;font-size:12px;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  border-radius:20px;padding:4px 12px 4px 14px;font-size:12.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
 }
-#evb b{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:700}
+#evb b{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:800}
 .ehbtn{
-  padding:1px 7px;font-size:11px;border-radius:8px;
-  border:1px solid rgba(255,255,255,0.12);background:transparent;
-  color:rgba(255,255,255,0.36);cursor:pointer;font-family:inherit;transition:all 0.13s;
+  padding:1px 6px;font-size:10px;border-radius:6px;
+  border:1px solid rgba(255,255,255,0.15);background:transparent;
+  color:rgba(255,255,255,0.4);cursor:pointer;font-family:inherit;
 }
-.ehbtn:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}
-#pips{display:flex;gap:4px;align-items:center}
-.pip{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.3s}
-.pip.d{background:var(--accent);box-shadow:0 0 5px var(--glow)}
+#pips{display:flex;gap:5px;align-items:center}
+.pip{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s}
+.pip.d{background:var(--accent);box-shadow:0 0 8px var(--accent)}
 
-/* ── GAME AREA ── */
+/* ── MAIN SHOWROOM AREA ── */
 #ga{
-  display:grid;grid-template-columns:96px 1fr 96px;gap:14px;
-  padding:8px 13px;max-width:1040px;margin:0 auto;position:relative;z-index:10;
-}
-#ga::before{
-  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:70%;height:80%;
-  background:radial-gradient(ellipse,rgba(255,215,0,0.022) 0%,transparent 68%);
-  pointer-events:none;
+  display:grid;grid-template-columns:105px 1fr 105px;gap:16px;
+  padding:12px 20px;max-width:1120px;margin:0 auto;position:relative;z-index:10;
 }
 
-/* ── VALUE BOARDS ── */
+/* ── VALUE LEADERBOARDS ── */
 .vb{display:flex;flex-direction:column;gap:4px}
 .vi{
-  padding:4px 5px;text-align:center;font-size:11px;font-weight:700;
+  padding:5px 6px;text-align:center;font-size:11.5px;font-weight:800;
   border-radius:4px;border:1px solid transparent;
-  transition:all 0.4s cubic-bezier(0.25, 1, 0.5, 1);font-variant-numeric:tabular-nums;line-height:1.2;
+  transition:all 0.35s cubic-bezier(0.25, 1, 0.5, 1);font-variant-numeric:tabular-nums;line-height:1.25;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
-.vi.lo{background:rgba(22,68,180,0.14);border-color:rgba(45,105,255,0.16);color:#88b0f0}
-.vi.hi{background:rgba(180,52,8,0.14); border-color:rgba(255,85,15,0.16); color:#f0a066}
-.vi.xx{background:rgba(255,255,255,0.01);border-color:transparent;color:rgba(255,255,255,0.08);text-decoration:line-through;transform:scale(0.96);opacity:0.6}
+.vi.lo{background:linear-gradient(to right, rgba(16,44,120,0.45), rgba(28,68,180,0.25));border-color:rgba(45,105,255,0.25);color:#a2c4ff}
+.vi.hi{background:linear-gradient(to right, rgba(140,32,4,0.45), rgba(190,55,10,0.25)); border-color:rgba(255,85,15,0.25); color:#ffb088}
+.vi.xx{background:rgba(0,0,0,0.4);border-color:rgba(255,255,255,0.02);color:rgba(255,255,255,0.05);text-decoration:line-through;transform:scale(0.95);box-shadow:none;opacity:0.4}
 
-/* ── BOX GRID ── */
-#bg{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-content:start}
+/* ── BRIEFCASE GRID ── */
+#bg{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;align-content:start}
 
-/* ── INDIVIDUAL BOX ── */
-.bwrap{perspective:580px}
+/* ── PREMIUM SUITCASE / CASE ASSEMBLY ── */
+.bwrap{perspective:600px}
 .bx{
-  position:relative;height:74px;border-radius:11px;cursor:pointer;
+  position:relative;height:78px;border-radius:10px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;flex-direction:column;
-  border:1px solid rgba(75,95,215,0.24);
+  border:1px solid rgba(100,125,255,0.25);
   background:
-    linear-gradient(162deg,#1b1d38 0%,#101224 50%,#1b1d38 100%),
-    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px);
-  box-shadow:0 3px 12px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.055);
-  overflow:hidden;transition:transform 0.11s ease,box-shadow 0.18s ease,border-color 0.18s ease;
+    linear-gradient(150deg,#1e2246 0%,#0f1124 50%,#151832 100%);
+  box-shadow:0 4px 15px rgba(0,0,0,0.6),inset 0 1px 1px rgba(255,255,255,0.08);
+  overflow:hidden;transition:transform 0.12s ease,box-shadow 0.18s ease,border-color 0.18s ease;
   outline:none;
 }
-.bx:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
-
+/* Center plate for container feel */
 .bx::before{
-  content:'';position:absolute;inset:0;border-radius:inherit;
-  background:linear-gradient(140deg,rgba(255,255,255,0.06) 0%,transparent 42%,rgba(0,0,0,0.14) 100%);
-  pointer-events:none;
+  content:'';position:absolute;inset:4px;border:1px dashed rgba(255,255,255,0.04);
+  border-radius:7px;pointer-events:none;
 }
+/* Luxury metallic handle assembly */
 .bx::after{
-  content:'';position:absolute;top:5px;left:50%;transform:translateX(-50%);
-  width:42%;height:11px;border:2px solid rgba(100,130,255,0.28);
-  border-bottom:1px solid rgba(100,130,255,0.15);border-radius:4px 4px 0 0;
-  transition:all 0.18s;
+  content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  width:38%;height:10px;border:2px solid rgba(140,165,255,0.3);
+  border-bottom:none;border-radius:4px 4px 0 0;transition:all 0.18s;
 }
 .bx:hover{
-  transform:translateY(-3px) scale(1.025);
-  border-color:rgba(110,140,255,0.52);
-  box-shadow:0 8px 24px rgba(0,0,0,0.65),0 0 20px rgba(80,105,220,0.14),inset 0 1px 0 rgba(255,255,255,0.1);
+  transform:translateY(-4px) scale(1.02);
+  border-color:rgba(130,165,255,0.6);
+  box-shadow:0 10px 24px rgba(0,0,0,0.7),0 0 20px rgba(100,130,255,0.18);
 }
-.bx:hover::after{border-color:rgba(145,170,255,0.52); top:3px;}
+.bx:hover::after{border-color:rgba(180,205,255,0.6); top:3px; height:12px;}
 
 .bx.mine{
-  border-color:rgba(255,215,0,0.55);
-  background:linear-gradient(162deg,#2e2200 0%,#1c1500 50%,#2e2200 100%);
-  box-shadow:0 3px 12px rgba(0,0,0,0.55),0 0 22px rgba(255,215,0,0.18),inset 0 1px 0 rgba(255,255,255,0.08);
+  border-color:rgba(255,215,0,0.6);
+  background:linear-gradient(150deg,#352902 0%,#1a1400 60%,#2b2102 100%);
+  box-shadow:0 4px 15px rgba(0,0,0,0.6),0 0 25px rgba(255,215,0,0.25),inset 0 1px 1px rgba(255,255,255,0.1);
   cursor:default;
 }
-.bx.mine::after{border-color:rgba(255,215,0,0.38)}
-.bx.mine:hover{transform:none;box-shadow:0 3px 12px rgba(0,0,0,0.55),0 0 22px rgba(255,215,0,0.18),inset 0 1px 0 rgba(255,255,255,0.08)}
+.bx.mine::after{border-color:rgba(255,215,0,0.45)}
+.bx.mine:hover{transform:none;box-shadow:0 4px 15px rgba(0,0,0,0.6),0 0 25px rgba(255,215,0,0.25)}
 
 .bx.open{
-  border-color:rgba(255,255,255,0.05);background:rgba(0,0,0,0.32);
-  box-shadow:inset 0 2px 10px rgba(0,0,0,0.55);cursor:default;
+  border-color:rgba(255,255,255,0.03);background:rgba(3,4,8,0.45);
+  box-shadow:inset 0 3px 12px rgba(0,0,0,0.8);cursor:default;
 }
 .bx.open::before,.bx.open::after{display:none}
-.bx.open:hover{transform:none;box-shadow:inset 0 2px 10px rgba(0,0,0,0.55)}
+.bx.open:hover{transform:none;box-shadow:inset 0 3px 12px rgba(0,0,0,0.8)}
 
-.bn{font-size:22px;font-weight:900;color:rgba(255,255,255,0.9);line-height:1;position:relative}
-.bl{font-size:8px;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.2);margin-top:2px;position:relative}
-.bv{font-size:12.5px;font-weight:700;text-align:center;padding:4px 3px;font-variant-numeric:tabular-nums;position:relative;line-height:1.15}
+.bn{font-family:'Bebas Neue',sans-serif;font-size:28px;font-weight:900;color:rgba(255,255,255,0.95);line-height:1;position:relative;letter-spacing:0.02em}
+.bl{font-size:8px;font-weight:800;letter-spacing:0.15em;color:rgba(255,255,255,0.25);margin-top:1px;position:relative}
+.bv{font-size:13.5px;font-weight:800;text-align:center;padding:4px 2px;font-variant-numeric:tabular-nums;position:relative;line-height:1.15}
 
-.bx.suspense-wait .bn { display: block; animation: pulse 0.4s infinite alternate; color: var(--accent); }
-.bx.suspense-wait .bl { display: block; }
-@keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
+/* Suspense Processing State */
+.bx.suspense-wait .bn { animation: pulseIntensity 0.35s infinite alternate; color: var(--accent); }
+.bx.suspense-wait .bl { color: var(--accent); opacity: 0.7; }
+@keyframes pulseIntensity { from { opacity: 0.25; transform: scale(0.95); } to { opacity: 1; transform: scale(1.05); } }
 
 @keyframes bOpen{
-  0%  {transform:rotateY(0deg) scale(1)}
-  33% {transform:rotateY(74deg) scale(1.07)}
-  63% {transform:rotateY(-14deg) scale(1.04)}
-  82% {transform:rotateY(5deg) scale(1.01)}
-  100%{transform:rotateY(0deg) scale(1)}
+  0%  {transform:rotateY(0deg)}
+  30% {transform:rotateY(80deg) scale(1.06)}
+  65% {transform:rotateY(-10deg) scale(1.02)}
+  100%{transform:rotateY(0deg)}
 }
-.bx.flipping{animation:bOpen 0.68s ease-in-out forwards}
+.bx.flipping{animation:bOpen 0.65s ease-in-out forwards}
 
-@keyframes bigGlow{
-  0%  {box-shadow:0 0 0 rgba(255,110,0,0)}
-  40% {box-shadow:0 0 55px rgba(255,110,0,0.9),0 0 115px rgba(255,50,0,0.38)}
-  100%{box-shadow:0 0 24px rgba(255,110,0,0.2)}
-}
-.bx.bigwin{animation:bigGlow 0.74s ease-out forwards}
-
-/* ── BANKER PANEL ── */
-#bwrap{position:relative;z-index:10;max-width:840px;margin:6px auto 14px;padding:0 13px}
+/* ── BANKER HUD PANEL ── */
+#bwrap{position:relative;z-index:10;max-width:860px;margin:8px auto 16px;padding:0 12px}
 #bp{
-  background:var(--panel);border:1px solid var(--glow);border-radius:14px;
-  padding:14px 18px 12px;
-  box-shadow:0 0 0 1px var(--dim),0 24px 60px rgba(0,0,0,0.72),inset 0 1px 0 rgba(255,255,255,0.04);
-  display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;
-  transition:border-color 0.5s,box-shadow 0.5s;
+  background:var(--panel);border:1px solid rgba(255,255,255,0.08);border-radius:14px;
+  padding:16px 20px 14px;backdrop-filter: blur(10px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.8),inset 0 1px 0 rgba(255,255,255,0.05);
+  display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;
 }
 #btit{
-  font-size:10px;font-weight:900;letter-spacing:0.24em;color:var(--accent);
-  margin-bottom:7px;display:flex;align-items:center;gap:7px;
+  font-size:10.5px;font-weight:900;letter-spacing:0.25em;color:var(--accent);
+  margin-bottom:8px;display:flex;align-items:center;gap:8px;
 }
 .bdot{
-  width:7px;height:7px;border-radius:50%;background:var(--accent);
-  box-shadow:0 0 8px var(--glow);flex-shrink:0;
+  width:8px;height:8px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 10px var(--accent);flex-shrink:0;
 }
 .bicon{font-size:18px;margin-left:2px}
-#btxt{font-size:15px;line-height:1.58;color:rgba(255,255,255,0.84);min-height:48px;white-space:pre-wrap}
+#btxt{font-size:15px;line-height:1.6;color:rgba(255,255,255,0.88);min-height:48px;white-space:pre-wrap}
 
-#bright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
-#olabel{font-size:10px;letter-spacing:0.2em;color:rgba(255,255,255,0.27);text-transform:uppercase;text-align:right}
+#bright{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
+#olabel{font-size:10px;letter-spacing:0.25em;color:rgba(255,255,255,0.3);text-transform:uppercase}
 #oamt{
-  font-family:'Bebas Neue','Impact',sans-serif;font-size:38px;letter-spacing:0.02em;
+  font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:0.01em;
   color:var(--accent);font-variant-numeric:tabular-nums;text-align:right;
-  min-height:44px;line-height:1.05;filter:drop-shadow(0 0 16px var(--glow));transition:color 0.5s;
+  min-height:46px;line-height:0.95;filter:drop-shadow(0 2px 10px rgba(0,0,0,0.8));
 }
-#cmeta{font-size:10.5px;color:rgba(255,255,255,0.27);text-align:right;margin-top:-2px}
-#dbtns{display:flex;gap:7px; flex-wrap:wrap; justify-content: flex-end;}
+#cmeta{font-size:11px;color:rgba(255,255,255,0.3);text-align:right}
+#dbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .db{
-  padding:10px 22px;border:none;border-radius:9px;font-size:13px;font-weight:900;
-  letter-spacing:0.08em;cursor:pointer;transition:all 0.14s;text-transform:uppercase;
-  font-family:'Barlow','Segoe UI',sans-serif;
+  padding:11px 24px;border:none;border-radius:8px;font-size:13.5px;font-weight:900;
+  letter-spacing:0.08em;cursor:pointer;transition:all 0.15s ease;text-transform:uppercase;
+  font-family:'Barlow',sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.4);
 }
-.db:disabled{opacity:0.18;cursor:not-allowed;pointer-events:none}
-#btnDeal{background:linear-gradient(135deg,#1db855,#167838);color:#fff;box-shadow:0 3px 14px rgba(20,180,80,0.32)}
-#btnDeal:not(:disabled):hover{background:linear-gradient(135deg,#24cc60,#1a9042);transform:translateY(-1px);box-shadow:0 6px 22px rgba(20,180,80,0.5)}
-#btnNoDeal{background:linear-gradient(135deg,#cc2020,#8a1212);color:#fff;box-shadow:0 3px 14px rgba(200,30,30,0.32)}
-#btnNoDeal:not(:disabled):hover{background:linear-gradient(135deg,#dd2828,#9a1414);transform:translateY(-1px);box-shadow:0 6px 22px rgba(200,30,30,0.5)}
-#btnCounter{background:linear-gradient(135deg,#2244bb,#112277);color:#fff;box-shadow:0 3px 14px rgba(30,60,200,0.32); padding: 10px 14px;}
-#btnCounter:not(:disabled):hover{background:linear-gradient(135deg,#3355dd,#113399);transform:translateY(-1px);box-shadow:0 6px 22px rgba(30,60,200,0.5)}
+.db:disabled{opacity:0.12;cursor:not-allowed;pointer-events:none;box-shadow:none}
+#btnDeal{background:linear-gradient(180deg,#20ca5e 0%,#127034 100%);color:#fff}
+#btnDeal:not(:disabled):hover{background:linear-gradient(180deg,#29df6b 0%,#16883f 100%);transform:translateY(-1px);box-shadow:0 6px 16px rgba(25,220,100,0.4)}
+#btnNoDeal{background:linear-gradient(180deg,#e02424 0%,#8e1010 100%);color:#fff}
+#btnNoDeal:not(:disabled):hover{background:linear-gradient(180deg,#f53333 0%,#a81414 100%);transform:translateY(-1px);box-shadow:0 6px 16px rgba(220,30,30,0.4)}
+#btnCounter{background:linear-gradient(180deg,#2b51df 0%,#132785 100%);color:#fff}
+#btnCounter:not(:disabled):hover{background:linear-gradient(180deg,#3e66f5 0%,#1934b3 100%);transform:translateY(-1px);box-shadow:0 6px 16px rgba(40,80,240,0.4)}
 
-#ttrack{height:2px;background:rgba(255,255,255,0.05);border-radius:1px;margin-top:7px;overflow:hidden}
-#tfill{height:100%;width:0%;background:var(--accent);transition:width linear;border-radius:1px}
+#ttrack{height:3px;background:rgba(255,255,255,0.04);border-radius:2px;margin-top:8px;overflow:hidden}
+#tfill{height:100%;width:0%;background:var(--accent);transition:width linear;border-radius:2px}
 
-@keyframes bpulse{
-  0%,100%{
-    border-color:var(--glow);
-    box-shadow:0 0 0 1px var(--dim),0 24px 60px rgba(0,0,0,0.72),inset 0 1px 0 rgba(255,255,255,0.04);
-  }
-  50%{
-    border-color:var(--accent);
-    box-shadow:0 0 0 3px var(--glow),0 0 38px var(--glow),0 24px 60px rgba(0,0,0,0.72),inset 0 1px 0 rgba(255,255,255,0.04);
-  }
+@keyframes ringSystemGlow {
+  0%,100%{ border-color: rgba(255,255,255,0.08); box-shadow:0 20px 50px rgba(0,0,0,0.8); }
+  50%{ border-color: var(--accent); box-shadow:0 0 25px var(--glow), 0 20px 50px rgba(0,0,0,0.8); }
 }
-#bp.ring{animation:bpulse 0.75s ease-in-out infinite}
+#bp.ring{animation:ringSystemGlow 0.8s ease-in-out infinite}
 
 /* ── PHONE OVERLAY ── */
 #phone{
-  position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-120px);
-  z-index:100;background:rgba(4,4,10,0.94);border:1px solid rgba(255,255,255,0.12);
-  border-radius:14px;padding:11px 24px;display:flex;align-items:center;gap:12px;
-  box-shadow:0 14px 45px rgba(0,0,0,0.85);transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
-  backdrop-filter:blur(12px);pointer-events:none;
+  position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-130px);
+  z-index:100;background:rgba(6,7,16,0.96);border:1px solid rgba(255,255,255,0.15);
+  border-radius:14px;padding:12px 26px;display:flex;align-items:center;gap:12px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.9);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  backdrop-filter:blur(15px);pointer-events:none;
 }
 #phone.up{transform:translateX(-50%) translateY(0)}
-#pico{font-size:27px;animation:ringshake 0.32s ease-in-out infinite}
-@keyframes ringshake{0%,100%{transform:rotate(-13deg)}50%{transform:rotate(13deg)}}
-#plbl{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:0.06em}
+#pico{font-size:28px;animation:ringshake 0.3s ease-in-out infinite}
+@keyframes ringshake{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+#plbl{font-size:13.5px;font-weight:900;color:var(--accent);letter-spacing:0.08em}
 
 /* ── AUDIENCE TOAST ── */
 #toast{
-  position:fixed;bottom:130px;left:50%;transform:translateX(-50%) translateY(60px);
-  z-index:50;background:rgba(0,0,0,0.85);border:1px solid rgba(255,255,255,0.1);
-  border-radius:30px;padding:8px 22px;font-size:19px;opacity:0;
+  position:fixed;bottom:140px;left:50%;transform:translateX(-50%) translateY(50px);
+  z-index:50;background:rgba(2,3,7,0.9);border:1px solid rgba(255,255,255,0.12);
+  border-radius:40px;padding:10px 26px;font-size:20px;font-weight:700;opacity:0;
   transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;
-  backdrop-filter:blur(8px);white-space:nowrap;
+  backdrop-filter:blur(10px);white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,0.6);
 }
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-/* ── DIM OVERLAY ── */
-#dimmer{position:fixed;inset:0;background:transparent;z-index:8;pointer-events:none;transition:background 0.28s}
-body.calling #dimmer{background:rgba(0,0,0,0.55)}
+#dimmer{position:fixed;inset:0;background:transparent;z-index:8;pointer-events:none;transition:background 0.3s}
+body.calling #dimmer{background:rgba(0,0,0,0.65)}
 
-/* ── CONFETTI ── */
 .cf{position:fixed;pointer-events:none;z-index:999;border-radius:2px;animation:cff linear forwards}
 @keyframes cff{from{transform:translateY(-20px) rotate(0deg);opacity:1}to{transform:translateY(105vh) rotate(720deg);opacity:0}}
 
-/* ── MODALS ── */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;padding:18px;z-index:200;backdrop-filter:blur(5px)}
-.modal.hidden{display:none}
+/* ── MODAL ARCHITECTURE ── */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;padding:20px;z-index:200;backdrop-filter:blur(6px)}
+.modal.hidden{display:none !important}
 .mc{
-  background:#0e0e18;border:1px solid rgba(255,255,255,0.09);border-radius:18px;
-  padding:22px;width:min(560px,100%);
-  box-shadow:0 0 0 1px rgba(255,255,255,0.04),0 32px 80px rgba(0,0,0,0.9);
-  animation:mpop 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
-  max-height:88vh;overflow-y:auto;
+  background:#0b0c16;border:1px solid rgba(255,255,255,0.1);border-radius:20px;
+  padding:26px;width:min(580px,100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.02),0 35px 90px rgba(0,0,0,0.95);
+  animation:mpop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  max-height:86vh;overflow-y:auto;
 }
-@keyframes mpop{from{transform:scale(0.9) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.mh h2{font-size:19px;font-weight:900;letter-spacing:0.01em}
+@keyframes mpop{from{transform:scale(0.92) translateY(15px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.mh h2{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.04em}
 .mx{
-  width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);
-  background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);cursor:pointer;
-  display:grid;place-items:center;font-size:16px;transition:all 0.13s;
+  width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);
+  background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;
+  display:grid;place-items:center;font-size:18px;transition:all 0.15s;
 }
 .mx:hover{background:rgba(255,255,255,0.1);color:#fff}
-.kv{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;margin:10px 0}
-.kr{padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13.5px;font-variant-numeric:tabular-nums;line-height:1.45}
+.kv{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;margin:12px 0}
+.kr{padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:14px;font-variant-numeric:tabular-nums;line-height:1.5}
 .kr:last-child{border-bottom:none}
-.big-r{text-align:center;font-family:'Bebas Neue','Impact',sans-serif;font-size:38px;letter-spacing:0.04em;margin:14px 0 6px;font-variant-numeric:tabular-nums}
-.good{color:#55ee66}.bad{color:#ff6655}
-.mbtns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.mbtn{padding:10px 22px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.14s}
-.mbtn:hover{background:rgba(255,255,255,0.1);color:#fff}
-.mbtn.gold{background:rgba(255,215,0,0.12);border-color:rgba(255,215,0,0.25);color:#FFD700}
-.mbtn.gold:hover{background:rgba(255,215,0,0.2)}
-.swap-btns{display:flex;gap:8px;margin-top:14px}
-.sk{flex:1;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.75);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.14s;text-align:center}
-.sk:hover{background:rgba(255,255,255,0.1);color:#fff}
-.sw{flex:1;padding:11px;border-radius:10px;border:1px solid rgba(80,120,255,0.28);background:rgba(40,60,185,0.12);color:#99aaff;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.14s;text-align:center}
-.sw:hover{background:rgba(40,60,185,0.24)}
+.big-r{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:0.02em;margin:16px 0 8px;font-variant-numeric:tabular-nums}
+.good{color:#4ee864; text-shadow: 0 0 15px rgba(80,230,100,0.2)}
+.bad{color:#ff4f4f; text-shadow: 0 0 15px rgba(255,80,80,0.2)}
+.mbtns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.mbtn{padding:11px 24px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.8);font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.15s;flex:1; min-width:120px; text-align:center}
+.mbtn:hover{background:rgba(255,255,255,0.12);color:#fff}
+.mbtn.gold{background:linear-gradient(180deg, rgba(255,215,0,0.25) 0%, rgba(180,140,0,0.15) 100%);border-color:rgba(255,215,0,0.35);color:#FFD700; font-weight:800}
+.mbtn.gold:hover{background:linear-gradient(180deg, rgba(255,215,0,0.35) 0%, rgba(180,140,0,0.25) 100%);box-shadow:0 0 15px rgba(255,215,0,0.2)}
+.swap-btns{display:flex;gap:10px;margin-top:16px}
+.sk{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:#fff;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.sk:hover{background:rgba(255,255,255,0.12)}
+.sw{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(100,135,255,0.3);background:rgba(30,55,170,0.2);color:#a2baff;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.sw:hover{background:rgba(30,55,170,0.35);color:#fff}
 
-@media(max-width:768px){
-  #ga{grid-template-columns:82px 1fr 82px;gap:8px;padding:6px 8px}
-  #bg{grid-template-columns:repeat(4,1fr);gap:7px}
-  .bx{height:60px}.bn{font-size:18px}.bx::after{display:none}
-  .vi{font-size:9.5px;padding:3px 4px}
-  #oamt{font-size:28px}#bp{grid-template-columns:1fr}
+@media(max-width:820px){
+  #ga{grid-template-columns:90px 1fr 90px;gap:10px;padding:8px 10px}
+  #bg{grid-template-columns:repeat(4,1fr);gap:8px}
+  .bx{height:64px}.bn{font-size:20px}.bx::after{display:none}
+  .vi{font-size:10px;padding:3px 4px}
+  #oamt{font-size:32px}#bp{grid-template-columns:1fr}
   #bright{align-items:flex-start;flex-direction:row;flex-wrap:wrap}
+  .neon-pillar { display:none; }
 }
-@media(max-width:480px){
-  #ga{grid-template-columns:1fr; max-width: 340px;}
-  .vb{flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px; margin-bottom: 8px;}
-  .vi{flex: 1 1 22%; min-width: 55px; font-size: 9px; padding: 2px;}
-  #bg{grid-template-columns:repeat(4, 1fr);}
+@media(max-width:520px){
+  #ga{grid-template-columns:1fr; max-width: 360px;}
+  .vb{flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px; margin-bottom: 10px;}
+  .vi{flex: 1 1 22%; min-width: 60px; font-size: 9.5px; padding: 3px 2px;}
+  #bg{grid-template-columns:repeat(4, 1fr); gap:6px;}
 }
 </style>
 </head>
 <body data-p="showman">
+
 <div id="dimmer"></div>
 <div id="flashOverlay"></div>
+<div id="leftPillar" class="neon-pillar"></div>
+<div id="rightPillar" class="neon-pillar"></div>
+
 <div id="phone"><span id="pico">📞</span><span id="plbl">THE BANKER IS CALLING</span></div>
 <div id="toast"></div>
 
 <div id="hd">
   <div class="ttl">DEAL OR NO DEAL</div>
-  <div class="ttl-sub">A Game of Risk &amp; Reward</div>
+  <div class="ttl-sub">Live Studio Edition</div>
 </div>
 
 <div id="ctrl">
@@ -363,7 +365,7 @@ body.calling #dimmer{background:rgba(0,0,0,0.55)}
     <button class="pb" data-p="goblin">🎲 Chaos</button>
   </div>
   <button class="cbtn" id="muteBtn" onclick="toggleMute()">🔊</button>
-  <button class="cbtn" style="background: rgba(255, 65, 65, 0.1); color: #ff8888; border-color: rgba(255,65,65,0.2);" onclick="location.reload()">↺ Restart</button>
+  <button class="cbtn restart-btn" onclick="location.reload()">↺ Restart Game</button>
   <button class="cbtn" onclick="openAnalysis()">📊 Analysis</button>
   <button class="cbtn" onclick="openStats()">🏆 Stats</button>
 </div>
@@ -423,13 +425,12 @@ body.calling #dimmer{background:rgba(0,0,0,0.55)}
 
 <div id="swapM" class="modal hidden">
   <div class="mc">
-    <div class="mh"><h2>🔀 Final Choice</h2><small style="color:#555">Two boxes remain</small></div>
+    <div class="mh"><h2>🔀 Final Choice</h2><small style="color:#666">Two boxes remain</small></div>
     <div id="swapB"></div>
     <div class="swap-btns">
       <button class="sk" onclick="finalSwap(false)">Keep My Box</button>
       <button class="sw" onclick="finalSwap(true)">Swap Boxes</button>
     </div>
-    <p style="color:#444;font-size:11px;margin-top:10px;">If there's a live offer, use Deal/No Deal first.</p>
   </div>
 </div>
 
@@ -452,7 +453,7 @@ body.calling #dimmer{background:rgba(0,0,0,0.55)}
 
 <script>
 // ═══════════════════════════════════════════════════
-//  META-PROGRESSION (LocalStorage)
+//  META-PROGRESSION STORAGE LAYER
 // ═══════════════════════════════════════════════════
 let userStats = JSON.parse(localStorage.getItem('dondStats')) || {
     gamesPlayed: 0,
@@ -465,7 +466,7 @@ function saveStats() {
 }
 
 // ═══════════════════════════════════════════════════
-//  PERSONAS — Adjusted for 22 Box Format
+//  AI PROBABILITY ENGINE PERSONALITIES
 // ═══════════════════════════════════════════════════
 const PERSONAS = {
   showman: {
@@ -475,10 +476,10 @@ const PERSONAS = {
       const base = 0.72 + 0.25 * Math.pow(prog, 1.15);
       return Math.round(ev * Math.min(1.01, Math.max(0.64, base + rand(-0.04,0.04))));
     },
-    maxCalls:8, plan:[5,3,3,3,3,2,1,1], oppo:false,
-    pre:["Ladies and gentlemen…","Oooh, this is tense.","The nation is watching.","I've been on the phone…","Breathe. Just breathe.","Right… here we go."],
+    maxCalls:8, plan:[5,3,3,3,3,2,1,1],
+    pre:["Ladies and gentlemen…","Oooh, this is getting intense.","The nation is holding its breath.","The phone is ringing for you…","Breathe. Just breathe.","Right… here we go."],
     lead:["Here is the banker's offer:","This is what's on the table:","The number is…","Tonight's offer is:"],
-    nod:["NO DEAL! The crowd goes wild!","Back to the boxes we go!","Bold. Very bold indeed.","The drama continues!","You love the pressure!"],
+    nod:["NO DEAL! The crowd goes wild!","Back to the board we go!","Bold. Very bold indeed.","The drama continues!","You love the pressure!"],
     rate:0.88, pitch:1.06
   },
   shark: {
@@ -488,9 +489,9 @@ const PERSONAS = {
       return Math.round(ev * Math.min(0.74, Math.max(0.46, base + rand(-0.02,0.05))));
     },
     maxCalls:10, plan:[5,3,3,3,2,2,1,1,1], oppo:true,
-    pre:["That hurt, didn't it.","I've been watching very carefully.","Your face says it all.","Another big one, gone.","You're playing with my money now."],
-    lead:["Here's what I'm offering:","Walk away. Take this.","This is mercy.","The only realistic figure:"],
-    nod:["Fine. Keep gambling.","I'll still be here.","Predictable.","More boxes. More mistakes.","You can't win them all."],
+    pre:["That hurt, didn't it?","I've been watching you very carefully.","Your facial expression says it all.","Another massive amount, gone.","You're playing with fire now."],
+    lead:["Here's what I'm offering:","Walk away. Take this configuration.","This is pure mercy.","The only realistic figure:"],
+    nod:["Fine. Keep gambling.","I'll still be right here.","Completely predictable.","More boxes. More catastrophic mistakes.","You can't outrun the numbers."],
     rate:0.76, pitch:0.7
   },
   analyst: {
@@ -498,10 +499,10 @@ const PERSONAS = {
     getOffer(ev, boxesLeft, n) {
       return Math.round(ev * (0.88 + Math.random() * 0.07));
     },
-    maxCalls:8, plan:[5,3,3,3,2,2,1,1,1], oppo:false, vTrigger:true,
-    pre:["Running calculation…","Variance threshold exceeded.","Decision point detected.","Model update complete.","Probability matrix loaded."],
-    lead:["Expected value output:","Calculated offer:","Statistically justified figure:","Optimal offer:"],
-    nod:["Suboptimal decision. Noted.","Continuing simulation.","Risk exposure increased.","Data logged. Proceed."],
+    maxCalls:8, plan:[5,3,3,3,2,2,1,1,1], vTrigger:true,
+    pre:["Running variance processing…","Mathematical threshold exceeded.","Strategic decision point detected.","Model optimization complete.","Probability matrix loaded."],
+    lead:["Expected value output:","Calculated offer value:","Statistically justified figure:","Optimal deal offer:"],
+    nod:["Suboptimal decision parameters. Noted.","Continuing structural simulation.","Risk exposure increased significantly.","Data entry logged. Proceed."],
     rate:1.15, pitch:0.88
   },
   goblin: {
@@ -509,10 +510,10 @@ const PERSONAS = {
     getOffer(ev, boxesLeft, n) {
       return Math.round(ev * (0.36 + Math.random() * 1.12));
     },
-    maxCalls:11, plan:[6,4,3,2,2,1,1,1,1], oppo:true, chaos:true,
-    pre:["I FELT that in my SOUL.","The chaos gods are SCREAMING.","oooOOOOOoooo","BIG energy. BIG.","I've been literally vibrating.","YES YES YES"],
-    lead:["The number spirits say:","I literally spun a wheel:","The dice have SPOKEN:","Close your eyes and feel… THIS:"],
-    nod:["YES! FEED THE CHAOS!","Glorious! Unhinged!","I respect the insanity.","RIDE OR DIE!","THE CHAOS GOBLIN IS PLEASED!"],
+    maxCalls:11, plan:[6,4,3,2,2,1,1,1,1], chaos:true,
+    pre:["I FELT that shift in my SOUL!","The chaos deities are SCREAMING.","oooOOOOOoooo!","MASSIVE energy right now.","I am literally vibrating over here.","YES YES YES!"],
+    lead:["The numerical spirits whisper:","I literally just spun a wheel:","The dice have spoken:","Close your eyes and feel… THIS:"],
+    nod:["YES! FEED THE CHAOS!","Glorious! Absolutely unhinged!","I highly respect the insanity.","RIDE OR DIE!","THE GOBLIN IS SATISFIED!"],
     rate:1.38, pitch:1.55
   }
 };
@@ -522,138 +523,114 @@ const LOW_V =[0.01, 0.1, 0.5, 1, 5, 10, 50, 100, 250, 500, 750];
 const HIGH_V=[1000, 3000, 5000, 10000, 15000, 20000, 35000, 50000, 75000, 100000, 250000];
 
 // ═══════════════════════════════════════════════════
-//  AUDIO ENGINE
+//  SAFE COMPREHENSIVE AUDIO ROUTERS
 // ═══════════════════════════════════════════════════
 const Snd = (() => {
-  let ctx,master,sfx,aud,mus,musOn=false,muted=false, hbInterval;
+  let ctx=null,master=null,sfx=null,aud=null,mus=null,musOn=false,muted=false,hbInterval=null;
 
   function boot(){
-    if(ctx){ctx.state==='suspended'&&ctx.resume();return}
-    ctx=new(window.AudioContext||window.webkitAudioContext)();
-    master=ctx.createGain();master.gain.value=0.72;master.connect(ctx.destination);
-    sfx=ctx.createGain();sfx.gain.value=1;sfx.connect(master);
-    aud=ctx.createGain();aud.gain.value=0.42;aud.connect(master);
-    mus=ctx.createGain();mus.gain.value=0;mus.connect(master);
+    try {
+      if(ctx) { if(ctx.state==='suspended') ctx.resume(); return; }
+      ctx=new(window.AudioContext||window.webkitAudioContext)();
+      master=ctx.createGain();master.gain.value=0.72;master.connect(ctx.destination);
+      sfx=ctx.createGain();sfx.gain.value=1;sfx.connect(master);
+      aud=ctx.createGain();aud.gain.value=0.42;aud.connect(master);
+      mus=ctx.createGain();mus.gain.value=0;mus.connect(master);
+    } catch(e) { console.warn("Audio Context launch suppressed:", e); }
   }
 
-  function t(f,type,vol,dur,t0=0,out){
-    if(!ctx)return;
-    const o=ctx.createOscillator(),g=ctx.createGain(),d=out||sfx;
-    o.type=type;o.frequency.value=f;
-    const s=ctx.currentTime+t0;
-    g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(vol,s+0.008);g.gain.exponentialRampToValueAtTime(0.0001,s+dur);
-    o.connect(g);g.connect(d);o.start(s);o.stop(s+dur+0.02);
+  function t(f,type,vol,dur,t0=0){
+    if(!ctx || muted) return;
+    try {
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type=type;o.frequency.value=f;
+      const s=ctx.currentTime+t0;
+      g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(vol,s+0.008);g.gain.exponentialRampToValueAtTime(0.0001,s+dur);
+      o.connect(g);g.connect(sfx);o.start(s);o.stop(s+dur+0.02);
+    } catch(err){}
   }
 
-  function noise(dur,cf,q,vol,atk=0.04,loop=false){
-    if(!ctx)return null;
-    const sz=Math.ceil(ctx.sampleRate*dur);
-    const buf=ctx.createBuffer(1,sz,ctx.sampleRate);
-    const d=buf.getChannelData(0);for(let i=0;i<sz;i++)d[i]=Math.random()*2-1;
-    const src=ctx.createBufferSource();src.buffer=buf; src.loop=loop;
-    const flt=ctx.createBiquadFilter();flt.type='bandpass';flt.frequency.value=cf;flt.Q.value=q;
-    const g=ctx.createGain();
-    g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(vol,ctx.currentTime+atk);
-    if(!loop) {
-        g.gain.setValueAtTime(vol,ctx.currentTime+dur*0.72);g.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
-    }
-    src.connect(flt);flt.connect(g);g.connect(aud);src.start(); 
-    if(!loop) src.stop(ctx.currentTime+dur+0.05);
-    return {src, g};
+  function noise(dur,cf,q,vol,atk=0.04){
+    if(!ctx || muted)return;
+    try {
+      const sz=Math.ceil(ctx.sampleRate*dur);
+      const buf=ctx.createBuffer(1,sz,ctx.sampleRate);
+      const d=buf.getChannelData(0);for(let i=0;i<sz;i++)d[i]=Math.random()*2-1;
+      const src=ctx.createBufferSource();src.buffer=buf;
+      const flt=ctx.createBiquadFilter();flt.type='bandpass';flt.frequency.value=cf;flt.Q.value=q;
+      const g=ctx.createGain();
+      g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(vol,ctx.currentTime+atk);
+      g.gain.setValueAtTime(vol,ctx.currentTime+dur*0.72);g.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
+      src.connect(flt);flt.connect(g);g.connect(aud);src.start();src.stop(ctx.currentTime+dur+0.05);
+    } catch(err){}
   }
-
-  let crowdLoop = null;
 
   return{
     boot,
-    setMute(m){muted=m;if(master)master.gain.value=m?0:0.72},
+    setMute(m){muted=m;if(master)master.gain.value=m?0:0.72; if(m)this.stopHeartbeat();},
     boxOpen(v){
       boot();
-      if(v>=50000){t(880,'triangle',0.07,0.4);t(1100,'triangle',0.055,0.36,0.04);t(1320,'sine',0.06,0.52,0.1);t(110,'sawtooth',0.04,0.3)}
+      if(v>=50000){t(880,'triangle',0.07,0.4);t(1100,'triangle',0.055,0.36,0.04);t(1320,'sine',0.06,0.52,0.1)}
       else if(v>=1000){t(660,'triangle',0.065,0.3);t(880,'triangle',0.046,0.26,0.06)}
       else{t(440,'triangle',0.046,0.14);t(550,'triangle',0.03,0.1,0.05)}
     },
-    phone(){
-      boot();
-      for(let r=0;r<3;r++){const b=r*0.82;t(478,'square',0.038,0.17,b);t(615,'square',0.038,0.17,b);t(478,'square',0.038,0.17,b+0.22);t(615,'square',0.038,0.17,b+0.22)}
-    },
-    offer(){
-      boot();
-      t(220,'sawtooth',0.055,0.14);t(196,'sawtooth',0.055,0.14,0.19);t(165,'sawtooth',0.085,0.52,0.38);t(110,'sawtooth',0.042,0.52,0.38);
-    },
-    deal(){
-      boot();
-      [523,659,784,1047].forEach((f,i)=>t(f,'triangle',0.068,0.28,i*0.115));t(1047,'sine',0.046,0.65,4*0.115);
-    },
-    nodeal(){boot();t(220,'sawtooth',0.058,0.19);t(185,'sawtooth',0.058,0.19,0.23);t(147,'sawtooth',0.08,0.4,0.48)},
-    applause(dur=2.5){boot();noise(dur,2400,0.45,0.32,0.1);noise(dur*0.75,900,0.28,0.14,0.2)},
-    gasp(s=1){boot();noise(0.55,1800,1.6,0.22*s,0.02);noise(0.72,3200,2,0.14*s,0.06)},
-    cheer(dur=1.8){
-      boot();noise(dur,2800,0.38,0.28,0.05);noise(dur*0.65,1400,0.28,0.18,0.15);
-      if(!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';
-      o.frequency.setValueAtTime(300,ctx.currentTime);o.frequency.linearRampToValueAtTime(520,ctx.currentTime+0.6);
-      g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.03,ctx.currentTime+0.1);g.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
-      o.connect(g);g.connect(aud);o.start();o.stop(ctx.currentTime+dur);
-    },
-    groan(){boot();noise(1.2,400,0.95,0.2,0.08);t(148,'sine',0.028,0.85)},
+    phone(){ boot(); for(let r=0;r<2;r++){const b=r*0.85;t(480,'square',0.03,0.15,b);t(620,'square',0.03,0.15,b)} },
+    offer(){ boot(); t(220,'sawtooth',0.05,0.15);t(165,'sawtooth',0.08,0.5,0.2); },
+    deal(){ boot(); [523,659,784,1047].forEach((f,i)=>t(f,'triangle',0.06,0.25,i*0.1)); },
+    nodeal(){ boot(); t(220,'sawtooth',0.05,0.2);t(147,'sawtooth',0.08,0.4,0.2); },
+    applause(dur=2.5){ boot(); noise(dur,2400,0.45,0.25,0.1); },
+    gasp(s=1){ boot(); noise(0.5,1800,1.6,0.2*s,0.02); },
+    cheer(dur=1.8){ boot(); noise(dur,2800,0.38,0.22,0.05); },
+    groan(){ boot(); noise(1.2,400,0.95,0.18,0.08); },
     drumRoll(dur=2.2){
-      boot();let ti=0,iv=0.052;
-      while(ti<dur){t(158+(ti/dur)*130,'triangle',0.032,0.038,ti);iv=Math.max(0.018,iv*0.955);ti+=iv}
+      boot(); if(!ctx || muted) return;
+      let ti=0,iv=0.05;
+      while(ti<dur){t(160+(ti/dur)*120,'triangle',0.03,0.04,ti);iv=Math.max(0.02,iv*0.95);ti+=iv}
     },
     startHeartbeat() {
-        if(hbInterval || !ctx) return;
+        if(hbInterval || !ctx || muted) return;
         hbInterval = setInterval(() => {
-            t(55, 'sine', 0.28, 0.4);
-            setTimeout(() => t(60, 'sine', 0.18, 0.3), 220);
+            t(55, 'sine', 0.25, 0.3);
+            setTimeout(() => t(55, 'sine', 0.12, 0.2), 200);
         }, 1100);
     },
-    stopHeartbeat() {
-        clearInterval(hbInterval); hbInterval = null;
-    },
-    updateCrowd(ev) {
-        if(!ctx) return;
-        if(!crowdLoop) crowdLoop = noise(2, 600, 1.0, 0, 1, true);
-        if(crowdLoop && crowdLoop.g) {
-            let vol = Math.min(0.08, (ev / 50000) * 0.08);
-            crowdLoop.g.gain.linearRampToValueAtTime(vol, ctx.currentTime + 1);
-        }
-    },
+    stopHeartbeat() { clearInterval(hbInterval); hbInterval = null; },
     startMusic(){
-      if(musOn)return;boot();musOn=true;
-      mus.gain.setValueAtTime(0,ctx.currentTime);mus.gain.linearRampToValueAtTime(0.38,ctx.currentTime+2.2);
-      const chords=[[196,247,294,370],[220,277,330,415],[185,233,277,349],[208,262,311,415]];
-      let ci=0;
-      const loop=()=>{
-        if(!musOn)return;
-        chords[ci++%chords.length].forEach(f=>{
-          const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;
-          g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.015,ctx.currentTime+0.45);
-          g.gain.setValueAtTime(0.015,ctx.currentTime+2.5);g.gain.linearRampToValueAtTime(0,ctx.currentTime+3.3);
-          o.connect(g);g.connect(mus);o.start();o.stop(ctx.currentTime+3.4);
-        });
-        setTimeout(loop,3100);
-      };loop();
+      if(musOn)return; boot(); if(!ctx)return; musOn=true;
+      try {
+        mus.gain.setValueAtTime(0,ctx.currentTime);mus.gain.linearRampToValueAtTime(0.3,ctx.currentTime+2);
+        const chords=[[196,247,294],[220,277,330],[185,233,277]]; let ci=0;
+        const loop=()=>{
+          if(!musOn)return;
+          chords[ci++%chords.length].forEach(f=>{
+            const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;
+            g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.012,ctx.currentTime+0.5);
+            g.gain.setValueAtTime(0.012,ctx.currentTime+2.2);g.gain.linearRampToValueAtTime(0,ctx.currentTime+3);
+            o.connect(g);g.connect(mus);o.start();o.stop(ctx.currentTime+3.1);
+          });
+          setTimeout(loop,3000);
+        };loop();
+      } catch(e){}
     },
     stopMusic(){
       musOn=false; this.stopHeartbeat();
-      if(crowdLoop) { crowdLoop.src.stop(); crowdLoop = null; }
-      try{if(mus&&ctx){mus.gain.cancelScheduledValues(ctx.currentTime);mus.gain.setValueAtTime(mus.gain.value,ctx.currentTime);mus.gain.linearRampToValueAtTime(0,ctx.currentTime+1.5)}}catch(e){}
+      try{if(mus&&ctx){mus.gain.cancelScheduledValues(ctx.currentTime);mus.gain.setValueAtTime(0,ctx.currentTime)}}catch(e){}
     }
   };
 })();
 
 // ═══════════════════════════════════════════════════
-//  SPEECH SYNTHESIS
+//  TEXT-TO-SPEECH LAYER
 // ═══════════════════════════════════════════════════
 const Say = (() => {
   const sy=window.speechSynthesis; let vv=[];
   if(sy){const load=()=>{vv=sy.getVoices()};load();sy.onvoiceschanged=load}
   return{
     speak(txt,persona){
-      if(!sy)return;
+      if(!sy || muteState)return;
       try{
         sy.cancel();const u=new SpeechSynthesisUtterance(txt);const p=PERSONAS[persona];
-        u.rate=p.rate||1;u.pitch=p.pitch||1;u.volume=0.78;
+        u.rate=p.rate||1;u.pitch=p.pitch||1;u.volume=0.75;
         const en=vv.filter(v=>v.lang.startsWith('en'));
         if(en.length)u.voice=en[Math.floor(Math.random()*Math.min(3,en.length))];
         sy.speak(u);
@@ -664,7 +641,7 @@ const Say = (() => {
 })();
 
 // ═══════════════════════════════════════════════════
-//  GAME STATE
+//  GAME STATE ARCHITECTURE
 // ═══════════════════════════════════════════════════
 let boxes=[],player=null,opened=0;
 let offerLive=false,curOffer=null,lastOffer=null,lastEV=null;
@@ -676,18 +653,15 @@ let counterAvailable = true;
 const hist=[];
 let curP='showman';
 
-// ═══════════════════════════════════════════════════
-//  UTILITIES
-// ═══════════════════════════════════════════════════
 const $=id=>document.getElementById(id);
-const fmt=v=>v<1?'£'+v.toFixed(2):'£'+Math.round(v).toLocaleString('en-GB');
+const fmt=v=>v<1?'1p':'£'+Math.round(v).toLocaleString('en-GB');
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const rand=(lo,hi)=>lo+Math.random()*(hi-lo);
 const rem=()=>boxes.map((b,i)=>({b,i})).filter(x=>!x.b.open);
 const remV=()=>rem().map(x=>x.b.value);
 const calcEV=()=>{const r=remV();return r.length?r.reduce((s,x)=>s+x,0)/r.length:0};
 const pers=()=>PERSONAS[curP];
-const vcol=v=>v>=75000?'#ff4433':v>=15000?'#ff9422':v>=1000?'#ffd700':v>=100?'#82ff9d':'#8ecaff';
+const vcol=v=>v>=75000?'#ff3b30':v>=15000?'#ff9500':v>=1000?'#ffcc00':v>=100?'#34c759':'#5ac8fa';
 
 function toggleMute(){
   muteState=!muteState;Snd.setMute(muteState);$('muteBtn').textContent=muteState?'🔇':'🔊';
@@ -697,17 +671,23 @@ function toggleMute(){
 function updateVignette() {
     const left = rem().length;
     const darkness = 1 - (left / 22); 
-    document.documentElement.style.setProperty('--darkness', Math.min(0.85, darkness * 1.1));
+    document.documentElement.style.setProperty('--darkness', Math.min(0.85, 0.2 + darkness * 0.8));
 }
 
-function triggerRedAlertFlash() {
-    const flash = $('flashOverlay');
-    flash.classList.add('hit');
-    setTimeout(() => flash.classList.remove('hit'), 150);
+function updateNeonPillars(color) {
+    const pillars = document.querySelectorAll('.neon-pillar');
+    pillars.forEach(p => {
+        p.style.background = color;
+        p.style.boxShadow = `0 0 20px ${color}, 0 0 40px ${color}`;
+        p.style.opacity = '0.55';
+    });
+    setTimeout(() => {
+        pillars.forEach(p => { p.style.opacity = '0.25'; });
+    }, 1500);
 }
 
 // ═══════════════════════════════════════════════════
-//  INIT
+//  GAME INITIALIZATION
 // ═══════════════════════════════════════════════════
 function init(){
   boxes=[...VALUES].sort(()=>Math.random()-0.5).map(v=>({value:v,open:false}));
@@ -736,27 +716,24 @@ function init(){
   counterAvailable = true; $('btnCounter').style.display='none';
   
   $('btnDeal').disabled=true;$('btnNoDeal').disabled=true;
-  $('oamt').textContent='—';$('cmeta').textContent='';$('btxt').textContent='Waiting for the game to begin…';
+  $('oamt').textContent='—';$('cmeta').textContent='';$('btxt').textContent='Select your personal briefcase to begin...';
   $('evAmt').textContent='—';$('stTxt').textContent='Pick your box to begin.';
   $('pips').innerHTML='';$('tfill').style.width='0%';
   document.body.dataset.p=curP;
   updateVignette();
 }
 
-// ═══════════════════════════════════════════════════
-//  PERSONA SWITCH
-// ═══════════════════════════════════════════════════
 $('pills').addEventListener('click',e=>{
   const b=e.target.closest('.pb');if(!b||player!==null)return;
   const p=b.dataset.p;if(!p)return;
   curP=p;document.body.dataset.p=p;
   document.querySelectorAll('.pb').forEach(x=>x.classList.toggle('on',x.dataset.p===p));
   const pe=PERSONAS[p];$('bico').textContent=pe.icon;
-  $('btxt').textContent=`${pe.icon} ${pe.name} is ready. Pick a box.`;
+  $('btxt').textContent=`${pe.icon} ${pe.name} is online. Choose a briefcase.`;
 });
 
 // ═══════════════════════════════════════════════════
-//  ROUND MANAGEMENT
+//  ROUND LOOP ENGINE
 // ═══════════════════════════════════════════════════
 function startRound(){
   const plan=pers().plan;
@@ -774,7 +751,7 @@ function drawPips(){
 }
 
 // ═══════════════════════════════════════════════════
-//  BOX CLICK & REVEAL
+//  BOX INTERACTION HANDLER
 // ═══════════════════════════════════════════════════
 function clickBox(i,el){
   if(offerLive||ended||swapPend||finalSt)return;
@@ -786,34 +763,44 @@ function clickBox(i,el){
   if(player===null){
     player=i;
     el.classList.add('mine');
-    el.innerHTML=`<span class="bn">${i+1}</span><span class="bl" style="color:rgba(255,215,0,0.45)">YOURS</span>`;
+    el.innerHTML=`<span class="bn">${i+1}</span><span class="bl" style="color:#ffd700">YOURS</span>`;
     document.querySelectorAll('.pb').forEach(b=>b.disabled=true);
     startRound();Snd.vib(30);
-    $('btxt').textContent=`📦 Box ${i+1} is yours. Let's play.`;
+    $('btxt').textContent=`📦 Briefcase ${i+1} locked. Clear the remaining cases to trigger offers.`;
     return;
   }
   if(opensLeft<=0)return;
 
-  const evBef=calcEV(),maxBef=Math.max(...remV());
-  boxes[i].open=true;opened++;opensLeft--;
+  // Local snapshot capture before state manipulation
+  const evBef=calcEV();
+  const maxBef=Math.max(...remV());
+  const clickedValue = boxes[i].value;
+  const itemColor = vcol(clickedValue);
+
+  boxes[i].open=true;
+  opened++;
+  opensLeft--;
   drawPips();
 
-  const vEl=$('vi'+boxes[i].value);if(vEl)vEl.classList.add('xx');
-
+  const vEl=$('vi'+clickedValue);if(vEl)vEl.classList.add('xx');
   el.classList.add('flipping');
-  Snd.boxOpen(boxes[i].value);Snd.vib(42);
-
-  const val = boxes[i].value;
-  const col = vcol(val);
+  Snd.boxOpen(clickedValue);Snd.vib(42);
   
-  if(val >= 50000) {
-      triggerRedAlertFlash(); // Game Show Red Studio Flash
+  if(clickedValue >= 50000) {
+      const flash = $('flashOverlay');
+      flash.className = 'flash-red';
+      updateNeonPillars('#ff3b30');
       el.classList.add('suspense-wait');
       el.innerHTML = `<span class="bn">...</span><span class="bl">WAIT</span>`;
-      Snd.drumRoll(2.2);
-      setTimeout(() => finalizeReveal(el, val, col, evBef, maxBef), 2200);
+      Snd.drumRoll(2.0);
+      setTimeout(() => finalizeReveal(el, clickedValue, itemColor, evBef, maxBef), 2000);
   } else {
-      setTimeout(() => finalizeReveal(el, val, col, evBef, maxBef), 500);
+      if (clickedValue <= 1) {
+          const flash = $('flashOverlay');
+          flash.className = 'flash-blue';
+          updateNeonPillars('#007aff');
+      }
+      setTimeout(() => finalizeReveal(el, clickedValue, itemColor, evBef, maxBef), 500);
   }
 }
 
@@ -828,7 +815,6 @@ function finalizeReveal(el, val, col, evBef, maxBef) {
     const evAft=calcEV();
     $('evAmt').textContent=fmt(evAft);
     updateVignette();
-    Snd.updateCrowd(evAft);
 
     if(rem().length <= 5 || evAft > 25000) Snd.startHeartbeat();
     else Snd.stopHeartbeat();
@@ -838,26 +824,30 @@ function finalizeReveal(el, val, col, evBef, maxBef) {
     analystTrig();
 
     if(opensLeft<=0){
-      if(!offerLive&&!roundSat){
-        setTimeout(()=>bankerCall('scheduled',`End of Round ${roundIdx}`),680);
+      if(!offerLive && !roundSat){
         roundSat=true;
+        setTimeout(()=>bankerCall('scheduled',`Round ${roundIdx - 1} Complete`),600);
       }
-      if(rem().length>2)startRound();
     }
-
+    
+    // Check if configuration calls for transition to final phase
     const rr=rem().map(x=>x.i);
-    if(rr.length===2)enterFinal(rr);
+    if(rr.length===2 && !offerLive) {
+        enterFinal(rr);
+    } else if(opensLeft > 0 && rem().length > 2) {
+        $('stTxt').textContent=`Round ${roundIdx} · Open ${opensLeft} box${opensLeft>1?'es':''}`;
+    }
 }
 
 // ═══════════════════════════════════════════════════
-//  AUDIENCE REACTIONS
+//  AUDIENCE REACTION SYSTEM
 // ═══════════════════════════════════════════════════
 const REACTS={
-  'big-gasp':{txt:'😱 OHHHH!',   fn:()=>{Snd.gasp(1.5);setTimeout(()=>Snd.applause(1.6),350)}},
-  'gasp':    {txt:'😮 Ooooh…',   fn:()=>Snd.gasp(0.9)},
-  'cheer':   {txt:'🎉 Yeahhhh!', fn:()=>Snd.cheer(1.7)},
-  'applause':{txt:'👏 Bravo!!',  fn:()=>Snd.applause(3.2)},
-  'groan':   {txt:'😬 Ohhhh…',   fn:()=>Snd.groan()},
+  'big-gasp':{txt:'😱 OUTRAGEOUS ELIMINATION!', fn:()=>{Snd.gasp(1.6);setTimeout(()=>Snd.groan(),200)}},
+  'gasp':    {txt:'😮 Red Eliminated…',   fn:()=>Snd.gasp(0.9)},
+  'cheer':   {txt:'🎉 Penny Saved!', fn:()=>Snd.cheer(1.6)},
+  'applause':{txt:'👏 Spectacular Output!',  fn:()=>Snd.applause(3.0)},
+  'groan':   {txt:'😬 Disaster Strike…',   fn:()=>Snd.groan()},
 };
 let toastT;
 function react(type){
@@ -867,7 +857,7 @@ function react(type){
 }
 
 // ═══════════════════════════════════════════════════
-//  OPPORTUNISTIC TRIGGERS
+//  DYNAMIC OPPORTUNISTIC RESPONSES
 // ═══════════════════════════════════════════════════
 function sharkTrig(maxBef,val){
   if(curP!=='shark'||offerLive||finalSt||oppoUsed||callCt>=pers().maxCalls)return;
@@ -891,21 +881,18 @@ function analystTrig(){
 }
 
 // ═══════════════════════════════════════════════════
-//  BANKER CALL
+//  THE BANKER PROTOCOL CONNECTORS
 // ═══════════════════════════════════════════════════
 function bankerCall(type,reason){
-  if(ended||player===null||offerLive)return;
+  if(ended||player===null)return;
   if(type!=='final'&&finalSt)return;
   const p=pers();if(callCt>=p.maxCalls)return;
-  const boxesL=rem().length;
-  if(type==='scheduled'){const cd=boxesL>10?3:2;if(opened-lastCallOpen<cd)return}
-
+  
   offerLive=true;
   const e=calcEV();lastEV=e;
-  const offer=p.getOffer(e,boxesL,callCt);
+  const offer=p.getOffer(e,rem().length,callCt);
   curOffer=offer;lastOffer=offer;callCt++;lastCallOpen=opened;
-  if(type==='scheduled')roundSat=true;
-  hist.push({callNo:callCt,type,reason,persona:curP,boxesL,ev:e,offer,decision:'(pending)'});
+  hist.push({callNo:callCt,type,reason,persona:curP,boxesL:rem().length,ev:e,offer,decision:'(pending)'});
 
   $('phone').classList.add('up');
   document.body.classList.add('calling');
@@ -923,8 +910,8 @@ function bankerCall(type,reason){
       $('oamt').textContent='—';
       Snd.offer();
       animOffer(offer);
-      const itypes={scheduled:'⏱ Scheduled',opportunistic:'🧠 Triggered',final:'⚡ Final'};
-      $('cmeta').textContent=`${itypes[type]||'📞'} — ${reason} — ${boxesL} boxes`;
+      const itypes={scheduled:'⏱ Scheduled Call',opportunistic:'🧠 Aggressive Alert',final:'⚡ Ultimatum'};
+      $('cmeta').textContent=`${itypes[type]||'📞'} — ${reason}`;
       $('evAmt').textContent=fmt(e);
       
       $('btnDeal').disabled=false;$('btnNoDeal').disabled=false;
@@ -933,13 +920,11 @@ function bankerCall(type,reason){
       startTimer();
       $('bp').classList.remove('ring');
       document.body.classList.remove('calling');
-      Snd.vib([55,28,55]);
-    },960);
+    },950);
   },1950);
 }
 
 function animOffer(target,ms=1380){
-  $('oamt').textContent='Calculating…';
   const t0=performance.now();
   const tick=now=>{
     const prog=Math.min(1,(now-t0)/ms);
@@ -950,7 +935,7 @@ function animOffer(target,ms=1380){
 }
 
 // ═══════════════════════════════════════════════════
-//  TIMER & RESET
+//  UI TIMERS & COMMITTED STATE RESPONSES
 // ═══════════════════════════════════════════════════
 function startTimer(ms=15000){
   const f=$('tfill');f.style.transition='none';f.style.width='0%';
@@ -958,13 +943,11 @@ function startTimer(ms=15000){
   f.style.transition=`width ${ms}ms linear`;f.style.width='100%';
   clearTimeout(timerH);
   timerH=setTimeout(()=>{
-    $('btxt').textContent='The banker is still waiting for your answer…';
-    $('cmeta').textContent='⌛ Time pressure elapsed';
+    $('btxt').textContent='The Banker demands an absolute answer... clock is running down.';
   },ms);
 }
-function stopTimer(){
-  clearTimeout(timerH);const f=$('tfill');f.style.transition='none';f.style.width='0%';
-}
+function stopTimer(){ clearTimeout(timerH); $('tfill').style.transition='none'; $('tfill').style.width='0%'; }
+
 function resetBanker(){
   offerLive=false;curOffer=null;
   $('btnDeal').disabled=true;$('btnNoDeal').disabled=true;
@@ -974,77 +957,75 @@ function resetBanker(){
   stopTimer();
 }
 
-// ═══════════════════════════════════════════════════
-//  DEAL / NO DEAL / COUNTER
-// ═══════════════════════════════════════════════════
 function acceptDeal(){
   if(ended||!offerLive)return;
   resetBanker();Say.stop();
-  Snd.deal();Snd.applause(3.8);Snd.vib([50,28,50,28,90]);react('applause');
+  Snd.deal();Snd.applause(3.5);
   const last=hist[hist.length-1];if(last&&last.decision==='(pending)')last.decision='DEAL';
   setTimeout(()=>endDeal(curOffer||lastOffer),600);
 }
+
 function declineDeal(){
   if(ended||!offerLive)return;
   resetBanker();Say.stop();
-  Snd.nodeal();Snd.cheer(1.6);Snd.vib(72);react('cheer');
+  Snd.nodeal();Snd.cheer(1.5);
   const last=hist[hist.length-1];if(last&&last.decision==='(pending)')last.decision='NO DEAL';
   const nd=rnd(pers().nod);$('btxt').textContent=nd;Say.speak(nd,curP);
-  if(finalSt&&!swapPend)setTimeout(showSwap,950);
+  
+  if(rem().length === 2) {
+      enterFinal(rem().map(x=>x.i));
+  } else if(opensLeft <= 0) {
+      startRound();
+  }
 }
 
 function initiateCounter() {
     if(ended||!offerLive||!counterAvailable)return;
-    const req = prompt("Make your counter-offer to the Banker (numbers only):");
+    const req = prompt("Type your strict counter-offer demand (Numbers only):");
     if(req === null || req.trim() === "") return;
     
     const amount = parseInt(req.replace(/[^0-9]/g, ''), 10);
-    if(isNaN(amount) || amount <= 0) {
-        alert("Invalid amount."); return;
-    }
+    if(isNaN(amount) || amount <= 0) return;
     
     counterAvailable = false;
     $('btnCounter').style.display='none';
     stopTimer();
     
-    $('btxt').textContent = `You requested ${fmt(amount)}. The Banker is considering...`;
+    $('btxt').textContent = `Submitting a counter demand of ${fmt(amount)} straight to the Banker box...`;
     $('bp').classList.add('ring');
     Snd.phone(); Snd.drumRoll(2);
     
     setTimeout(() => {
         $('bp').classList.remove('ring');
         const ev = lastEV || calcEV();
-        const maxThreshold = Math.max(ev * 1.0, (curOffer||lastOffer) * 1.15);
+        const maxThreshold = Math.max(ev * 0.95, (curOffer||lastOffer) * 1.12);
         
         if(amount <= maxThreshold) {
-            $('btxt').textContent = `The Banker says... DEAL. They accepted your counter-offer!`;
-            Say.speak("Deal.", curP);
+            $('btxt').textContent = `The Banker has accepted your counter offer conditions!`;
+            Say.speak("Deal settled.", curP);
             curOffer = amount;
             acceptDeal();
         } else {
-            $('btxt').textContent = `The Banker says NO DEAL. They rejected ${fmt(amount)}.`;
-            Say.speak("Absolutely not.", curP);
+            $('btxt').textContent = `The Banker rejected ${fmt(amount)} immediately. Decision required on native parameters.`;
+            Say.speak("No chance.", curP);
             react('groan');
-            startTimer();
+            startTimer(8000);
         }
-    }, 2500);
+    }, 2200);
 }
 
 // ═══════════════════════════════════════════════════
-//  FINAL STAGE
+//  FINAL CONFIGURATION PHASE
 // ═══════════════════════════════════════════════════
 function enterFinal(twoIdx){
   finalSt=true;
   otherBox=twoIdx[0]===player?twoIdx[1]:twoIdx[0];
-  $('stTxt').textContent='Final stage · Two boxes remain';
-  const canCall=!offerLive&&callCt<pers().maxCalls;
-  if(canCall){
-    setTimeout(()=>{
-      bankerCall('final','Two boxes left');
-      if(!offerLive)setTimeout(showSwap,450);
-    },720);
-  }else{
-    setTimeout(showSwap,720);
+  $('stTxt').textContent='Final Showdown · Two Briefcases Remain';
+  
+  if(!offerLive && callCt<pers().maxCalls && lastOffer !== null){
+    setTimeout(()=>{ bankerCall('final','Ultimatum Window Open'); },600);
+  }else if(!offerLive){
+    setTimeout(showSwap,600);
   }
 }
 
@@ -1052,29 +1033,28 @@ function showSwap(){
   swapPend=true;const e=lastEV??calcEV();
   $('swapB').innerHTML=`
     <div class="kv">
-      <div class="kr"><b>Your box:</b> #${player+1}</div>
-      <div class="kr"><b>Other box:</b> #${otherBox+1}</div>
-      <div class="kr"><b>EV right now:</b> ${fmt(e)}</div>
+      <div class="kr"><b>Your Selected Case:</b> #${player+1}</div>
+      <div class="kr"><b>Remaining Floor Case:</b> #${otherBox+1}</div>
+      <div class="kr"><b>Mathematical Fair Value (EV):</b> ${fmt(e)}</div>
     </div>`;
   $('swapM').classList.remove('hidden');
 }
 
 function finalSwap(doSwap){
-  if(ended||revLock)return;revLock=true;
+  swapPend=false;
   $('swapM').classList.add('hidden');
   const fi=doSwap?otherBox:player;
   const fv=boxes[fi].value,ov=boxes[doSwap?player:otherBox].value;
-  Snd.drumRoll(2.3);
-  $('btxt').textContent='…the final box opens…';$('cmeta').textContent='🎬 Final reveal';
+  Snd.drumRoll(2.5);
+  $('btxt').textContent='Opening the payload briefcase…';
   setTimeout(()=>{
-    revLock=false;Snd.offer();
-    react(fv>=50000?'big-gasp':fv>=10000?'gasp':'cheer');
+    Snd.offer();
     endNoDeal(doSwap,fi,fv,ov,lastOffer||0);
-  },2400);
+  },2500);
 }
 
 // ═══════════════════════════════════════════════════
-//  END GAME & STATS SAVING
+//  GAME END SYSTEM TERMINATION
 // ═══════════════════════════════════════════════════
 function recordGameStats(winnings, isWin) {
     userStats.gamesPlayed++;
@@ -1085,72 +1065,63 @@ function recordGameStats(winnings, isWin) {
 }
 
 function endDeal(deal){
-  ended=true;$('btnDeal').disabled=true;$('btnNoDeal').disabled=true;offerLive=false;
-  Snd.stopMusic();
+  ended=true; offerLive=false; Snd.stopMusic();
   const bv=boxes[player].value,e=lastEV??calcEV(),d=Math.round(deal-e);
   const pct=e?Math.round(deal/e*100):null,good=deal>=bv;
   
   recordGameStats(deal, good);
-
   if(good){confetti();react('applause')}else react('groan');
-  $('endT').textContent='🤝 DEAL ACCEPTED';
+  
+  $('endT').textContent='🤝 DEAL AGREED';
   $('endB').innerHTML=`
     <div class="big-r ${good?'good':'bad'}">${fmt(deal)}</div>
     <div class="kv">
-      <div class="kr"><b>You accepted:</b> ${fmt(deal)}</div>
-      <div class="kr"><b>Box contained:</b> ${fmt(bv)}</div>
-      <div class="kr"><b>EV at last call:</b> ${fmt(e)}</div>
-      <div class="kr"><b>Offer vs EV:</b> ${pct??'—'}% (${fmt(Math.abs(d))} ${d>=0?'above':'below'})</div>
-    </div>
-    <p class="${good?'good':'bad'}" style="margin-top:12px; font-weight:700;">${good?'🏆 Great call — you outperformed your box!':'😬 Bad luck — the banker got the better deal.'}</p>`;
+      <div class="kr"><b>Acquired Settlement Winnings:</b> ${fmt(deal)}</div>
+      <div class="kr"><b>Content of Your Briefcase:</b> ${fmt(bv)}</div>
+      <div class="kr"><b>Expected Value Benchmarking:</b> ${fmt(e)}</div>
+      <div class="kr"><b>Efficiency:</b> ${pct??'—'}% of fair value</div>
+    </div>`;
   $('endM').classList.remove('hidden');
 }
 
 function endNoDeal(swapped,fi,fv,ov,lo){
-  ended=true;$('btnDeal').disabled=true;$('btnNoDeal').disabled=true;offerLive=false;
-  Snd.stopMusic();
+  ended=true; offerLive=false; Snd.stopMusic();
   const e=lastEV??calcEV(),d=Math.round(fv-e),good=fv>=ov;
   
   recordGameStats(fv, fv > lo);
-
   if(good){confetti();react('applause')}else react('groan');
-  $('endT').textContent='🔥 NO DEAL COMPLETE';
+  
+  $('endT').textContent='🔥 LIVE REVEAL BOX COMPLETED';
   $('endB').innerHTML=`
     <div class="big-r ${good?'good':'bad'}">${fmt(fv)}</div>
     <div class="kv">
-      <div class="kr"><b>Decision:</b> ${swapped?'SWAPPED 🔀':'KEPT your box'}</div>
-      <div class="kr"><b>Final box #${fi+1}:</b> ${fmt(fv)}</div>
-      <div class="kr"><b>Other box:</b> ${fmt(ov)}</div>
-      <div class="kr"><b>Last offer:</b> ${lo?fmt(lo):'—'}</div>
-      <div class="kr"><b>Outcome vs EV:</b> ${fmt(Math.abs(d))} ${d>=0?'above':'below'} EV</div>
-    </div>
-    <p class="${good?'good':'bad'}" style="margin-top:12px; font-weight:700;">${good?'🎉 Fearless! You backed yourself and won!':'😔 That stings… but you went for glory.'}</p>`;
+      <div class="kr"><b>Final Action:</b> ${swapped?'SWAPPED BRIEFCASES 🔀':'RETAINED NATIVE CHOICE'}</div>
+      <div class="kr"><b>Opened Case Value (#${fi+1}):</b> ${fmt(fv)}</div>
+      <div class="kr"><b>Alternative Case Content:</b> ${fmt(ov)}</div>
+      <div class="kr"><b>Final Banker Offer Refused:</b> ${lo?fmt(lo):'—'}</div>
+    </div>`;
   $('endM').classList.remove('hidden');
 }
 
-// ═══════════════════════════════════════════════════
-//  CONFETTI
-// ═══════════════════════════════════════════════════
 function confetti(){
-  const cols=['#FFD700','#FF6633','#55FF66','#66AAFF','#FF55FF','#FF9900'];
-  for(let i=0;i<62;i++){
-    const el=document.createElement('div');el.className='cf';
-    const size=6+Math.random()*9;
-    el.style.cssText=`left:${Math.random()*100}vw;top:-22px;background:${cols[i%cols.length]};width:${size}px;height:${size}px;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*0.65}s;border-radius:${Math.random()>0.5?'50%':'2px'}`;
-    document.body.appendChild(el);setTimeout(()=>el.remove(),5e3);
+  const cols=['#FFD700','#FF6633','#55FF66','#66AAFF','#FF55FF'];
+  for(let i=0;i<50;i++){
+    const el=document.createElement('div');el.className='cf';const size=6+Math.random()*8;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-22px;background:${cols[i%cols.length]};width:${size}px;height:${size}px;animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;border-radius:2px`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),4500);
   }
 }
 
 // ═══════════════════════════════════════════════════
-//  MODALS & HELPERS
+//  METRICS PRESENTATION SYSTEMS
 // ═══════════════════════════════════════════════════
 $('evhBtn').addEventListener('click',()=>{
   const r=remV(),sum=r.reduce((a,b)=>a+b,0),avg=r.length?sum/r.length:0;
   $('evB').innerHTML=`
-    <p><b>EV</b> = <b>Expected Value</b>. The average prize you'd win if you replayed this exact situation many times.</p>
+    <p><b>Expected Value (EV)</b> calculates the raw statistical average of all prizes left on the floor layout matrix.</p>
     <div class="kv">
-      <div class="kr"><b>Formula:</b> sum of remaining prizes ÷ number of boxes</div>
-      <div class="kr"><b>Right now:</b> ${fmt(sum)} ÷ ${r.length} = <b>${fmt(avg)}</b></div>
+      <div class="kr"><b>Formula:</b> Total Aggregated Cash ÷ Remaining Briefcases</div>
+      <div class="kr"><b>Active Equation:</b> ${fmt(sum)} ÷ ${r.length} = <b>${fmt(avg)}</b></div>
     </div>`;
   $('evM').classList.remove('hidden');
 });
@@ -1158,36 +1129,33 @@ $('evhBtn').addEventListener('click',()=>{
 function openAnalysis(){
   const p=pers();
   let html=`<div class="kv">
-    <div class="kr"><b>Banker:</b> ${p.icon} ${p.name}</div>
-    <div class="kr"><b>Round plan:</b> [${p.plan.join(', ')}]</div>
-    <div class="kr"><b>Calls:</b> ${callCt}/${p.maxCalls} · Boxes opened: ${opened} / ${VALUES.length}</div>
+    <div class="kr"><b>Current Persona:</b> ${p.icon} ${p.name}</div>
+    <div class="kr"><b>Briefcases Eliminated:</b> ${opened} / 22</div>
   </div>`;
   if(hist.length){
-    html+=`<div class="kv"><div class="kr" style="font-weight:700">Banker Call Log:</div>`;
+    html+=`<div class="kv"><div class="kr" style="font-weight:700">Call Logs:</div>`;
     hist.forEach(h=>{
-      const pct=h.ev?Math.round(h.offer/h.ev*100):null;
-      html+=`<div class="kr">#${h.callNo} <b>${h.type.toUpperCase()}</b> — ${h.reason}<br>EV ${fmt(h.ev)} → Offer ${fmt(h.offer)} ${pct?`(${pct}% of EV)`:''} → <b>${h.decision}</b></div>`;
+      html+=`<div class="kr">#${h.callNo} ${h.type.toUpperCase()} → Offer ${fmt(h.offer)} → <b>${h.decision}</b></div>`;
     });
     html+=`</div>`;
-  }else html+=`<p style="color:#555;margin-top:10px">No banker calls yet.</p>`;
+  }
   $('anaB').innerHTML=html;$('anaM').classList.remove('hidden');
 }
 
 function openStats() {
-    let winRate = userStats.gamesPlayed > 0 ? Math.round((userStats.winsAgainstBanker / userStats.gamesPlayed) * 100) : 0;
+    let rate = userStats.gamesPlayed > 0 ? Math.round((userStats.winsAgainstBanker / userStats.gamesPlayed) * 100) : 0;
     $('statsB').innerHTML = `
         <div class="kv">
-            <div class="kr"><b>Games Played:</b> ${userStats.gamesPlayed}</div>
-            <div class="kr"><b>Total Winnings:</b> ${fmt(userStats.totalWinnings)}</div>
-            <div class="kr"><b>Biggest Deal/Win:</b> ${fmt(userStats.biggestDeal)}</div>
-            <div class="kr"><b>Win Rate (Beat Banker):</b> ${winRate}%</div>
-        </div>
-    `;
+            <div class="kr"><b>Games Profile Registered:</b> ${userStats.gamesPlayed}</div>
+            <div class="kr"><b>Aggregated Career Earnings:</b> ${fmt(userStats.totalWinnings)}</div>
+            <div class="kr"><b>Max High Value Win Event:</b> ${fmt(userStats.biggestDeal)}</div>
+            <div class="kr"><b>Banker Domination Ratio:</b> ${rate}%</div>
+        </div>`;
     $('statsM').classList.remove('hidden');
 }
 
 function clearStats() {
-    if(confirm("Are you sure you want to reset all your career stats?")) {
+    if(confirm("Purge profile tracking histories entirely?")) {
         userStats = { gamesPlayed: 0, totalWinnings: 0, biggestDeal: 0, winsAgainstBanker: 0 };
         saveStats(); openStats();
     }
