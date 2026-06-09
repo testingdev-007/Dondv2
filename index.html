@@ -84,9 +84,9 @@ body::after {
 .pb:hover{color:#fff}
 .pb.on{background:rgba(255,255,255,0.12);color:#fff}
 .pb[data-p="showman"].on{background:rgba(255,215,0,0.22);color:#FFD700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
-.pb[data-p="shark"].on  {background:rgba(255,51,68,0.22); color:#FF5566;text-shadow:0 0 8px rgba(255,51,68,0.4)}
+.pb[data-p="shark"].on{background:rgba(255,51,68,0.22); color:#FF5566;text-shadow:0 0 8px rgba(255,51,68,0.4)}
 .pb[data-p="analyst"].on{background:rgba(0,221,255,0.18); color:#33E4FF;text-shadow:0 0 8px rgba(0,221,255,0.4)}
-.pb[data-p="goblin"].on {background:rgba(200,68,255,0.22);color:#D466FF;text-shadow:0 0 8px rgba(200,68,255,0.4)}
+.pb[data-p="goblin"].on{background:rgba(200,68,255,0.22);color:#D466FF;text-shadow:0 0 8px rgba(200,68,255,0.4)}
 
 .cbtn{
   padding:7px 16px;border-radius:100px;border:1px solid var(--border);
@@ -397,9 +397,19 @@ body.calling #dimmer{background:rgba(0,0,0,0.65)}
   <div id="ttrack"><div id="tfill"></div></div>
 </div>
 
+<div id="welcomeM" class="modal">
+  <div class="mc" style="text-align: center; padding: 35px 25px;">
+    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--accent); margin-bottom: 10px;">WELCOME TO THE STUDIO!</h2>
+    <p style="font-size: 16px; rgba(255,255,255,0.85); line-height: 1.6; margin-bottom: 25px;">
+      Prepare to face off against the hidden figures of risk and fortune. Step onto the main floor, hold onto your case, and prepare your strategies.
+    </p>
+    <button class="mbtn gold" onclick="dismissWelcomeAndBootAudio()" style="font-size: 18px; padding: 14px 40px; border-radius: 50px; display: inline-block; width: auto;">🎬 ENTER SHOWROOM</button>
+  </div>
+</div>
+
 <div id="endM" class="modal hidden">
   <div class="mc">
-    <div class="mh"><h2>FINAL BROADCAST RESULT</h2></div>
+    <div class="mh"><h2>FINAL BROADCAST SUMMARY</h2></div>
     <div id="endB"></div>
     <div class="mbtns">
       <button class="mbtn gold" onclick="location.reload()" style="font-size: 16px; padding: 14px 20px;">▶ Play Again</button>
@@ -409,7 +419,7 @@ body.calling #dimmer{background:rgba(0,0,0,0.65)}
 
 <div id="evM" class="modal hidden">
   <div class="mc">
-    <div class="mh"><h2>What is EV?</h2><button class="mx" onclick="closeM('evM')">×</button></div>
+    <div class="mh"><h2>🎈 What on Earth is EV? 🎈</h2><button class="mx" onclick="closeM('evM')">×</button></div>
     <div id="evB"></div>
   </div>
 </div>
@@ -457,7 +467,7 @@ function saveStats() {
 }
 
 // ═══════════════════════════════════════════════════
-//  AI BANKER PERSONAS
+//  AI BANKER PERSONAS — DEEP IMMERSION EDITION
 // ═══════════════════════════════════════════════════
 const PERSONAS = {
   showman: {
@@ -468,9 +478,32 @@ const PERSONAS = {
       return Math.round(ev * Math.min(1.01, Math.max(0.64, base + rand(-0.04,0.04))));
     },
     maxCalls:8, plan:[5,3,3,3,3,2,1,1],
-    pre:["Ladies and gentlemen…","Oooh, this is getting intense.","The nation is holding its breath.","The phone is ringing for you…","Breathe. Just breathe.","Right… here we go."],
-    lead:["Here is the banker's offer:","This is what's on the table:","The number is…","Tonight's offer is:"],
-    nod:["NO DEAL! The crowd goes wild!","Back to the board we go!","Bold. Very bold indeed.","The drama continues!","You love the pressure!"],
+    pre:[
+      "Ladies and gentlemen, the spotlight shifts here!",
+      "Oooh, this tension is building beautifully on set.",
+      "The entire country is tracking this run live.",
+      "The phone lines are burning up right now.",
+      "Breathe in, stay calm. Absolute drama here.",
+      "This is what game shows are truly made for!",
+      "An unbelievable turn of cards on the studio floor.",
+      "The crowd is holding its breath right now."
+    ],
+    lead:[
+      "Here is the banker's brilliant offer:",
+      "This is what's on the table right now:",
+      "The golden number is...",
+      "Tonight's high-stakes offer stands at:",
+      "Look at this spectacular buyout choice:"
+    ],
+    nod:[
+      "NO DEAL! The crowd goes absolutely wild!",
+      "Back to the board we go to hunting golds!",
+      "Bold. Incredibly bold move on this set.",
+      "The studio drama continues into the next stage!",
+      "You absolutely thrive under this intense pressure!",
+      "No safety net chosen. Onward!",
+      "He wants your cases dropped. Keep moving!"
+    ],
     rate:0.88, pitch:1.06
   },
   shark: {
@@ -480,9 +513,32 @@ const PERSONAS = {
       return Math.round(ev * Math.min(0.74, Math.max(0.46, base + rand(-0.02,0.05))));
     },
     maxCalls:10, plan:[5,3,3,3,2,2,1,1,1], oppo:true,
-    pre:["That hurt, didn't it?","I've been watching you very carefully.","Your facial expression says it all.","Another massive amount, gone.","You're playing with my money now."],
-    lead:["Here's what I'm offering:","Walk away. Take this configuration.","This is pure mercy.","The only realistic figure:"],
-    nod:["Fine. Keep gambling.","I'll still be right here.","Completely predictable.","More boxes. More catastrophic mistakes.","You can't outrun the numbers."],
+    pre:[
+      "That elimination crushed your position, didn't it?",
+      "I've been analyzing your tells very carefully.",
+      "Your facial expression says everything right now.",
+      "Another massive target gone. You're bleeding out.",
+      "You are playing with my currency on my floor.",
+      "Your confidence is crumbling by the minute.",
+      "A massive mistake left you open to my leverage.",
+      "You can't hide your panic from this desk."
+    ],
+    lead:[
+      "Here's what I'm willing to offer to end this:",
+      "Walk away now. Take this configuration:",
+      "This choice is pure corporate mercy:",
+      "The only logical cash buyout on my dashboard:",
+      "Sign the contract and exit with this sum:"
+    ],
+    nod:[
+      "Fine. Keep bleeding on the board.",
+      "I'll still be sitting right here when you drop.",
+      "Completely predictable stubbornness.",
+      "More cases means more catastrophic errors.",
+      "You can't outrun my trap forever.",
+      "Pride before a massive structural fall.",
+      "Go on, open more. Push your luck until it snaps."
+    ],
     rate:0.76, pitch:0.7
   },
   analyst: {
@@ -491,9 +547,32 @@ const PERSONAS = {
       return Math.round(ev * (0.88 + Math.random() * 0.07));
     },
     maxCalls:8, plan:[5,3,3,3,2,2,1,1,1], vTrigger:true,
-    pre:["Running variance processing…","Mathematical threshold exceeded.","Strategic decision point detected.","Model optimization complete.","Probability matrix loaded."],
-    lead:["Expected value output:","Calculated offer value:","Statistically justified figure:","Optimal deal offer:"],
-    nod:["Suboptimal decision parameters. Noted.","Continuing simulation.","Risk exposure increased significantly.","Data entry logged. Proceed."],
+    pre:[
+      "Running real-time variance processing formulas...",
+      "Mathematical threshold metrics have been exceeded.",
+      "Strategic distribution decision point detected.",
+      "Model optimization protocols completed.",
+      "Probability distribution matrices successfully loaded.",
+      "Analyzing player risk behavior profile.",
+      "Evaluating current mathematical outliers.",
+      "Anomalous distribution pattern registered."
+    ],
+    lead:[
+      "Expected value baseline calculation:",
+      "Calculated alternative offer value:",
+      "Statistically justified cash evaluation:",
+      "Optimal risk buyout value recommendation:",
+      "Computed settlement amount:"
+    ],
+    nod:[
+      "Suboptimal decision parameters logged.",
+      "Continuing real-time simulation runs.",
+      "Player risk exposure increased by twenty percent.",
+      "Data entry recorded. Advance layout parameters.",
+      "Bypassing safe settlement option. Proceeding.",
+      "Anomalous choice matrix tracked.",
+      "Stochastic modeling parameters shifted."
+    ],
     rate:1.15, pitch:0.88
   },
   goblin: {
@@ -502,9 +581,32 @@ const PERSONAS = {
       return Math.round(ev * (0.36 + Math.random() * 1.12));
     },
     maxCalls:11, plan:[6,4,3,2,2,1,1,1,1], chaos:true,
-    pre:["I FELT that shift in my SOUL!","The chaos deities are SCREAMING.","oooOOOOOoooo!","MASSIVE energy right now.","I am literally vibrating over here.","YES YES YES!"],
-    lead:["The numerical spirits whisper:","I literally just spun a wheel:","The dice have spoken:","Close your eyes and feel… THIS:"],
-    nod:["YES! FEED THE CHAOS!","Glorious! Absolutely unhinged!","I highly respect the insanity.","RIDE OR DIE!","THE GOBLIN IS SATISFIED!"],
+    pre:[
+      "I FELT that structural shift deep in my SOUL!",
+      "The absolute chaos deities are screaming out!",
+      "oooOOOOOoooo, look at those colors spin!",
+      "MASSIVE erratic static energy inside the showroom!",
+      "I am literally vibrating over these targets!",
+      "YES YES YES, blow the whole deck wide open!",
+      "Who needs safe cards when you have madness?!",
+      "I am cackling at this board setup right now!"
+    ],
+    lead:[
+      "The erratic numerical spirits whisper this:",
+      "I literally just spun a random wooden wheel:",
+      "The magical plastic dice have spoken:",
+      "Close your eyes and feel... THIS number:",
+      "Pretend this is giant bags of candy candy candy:"
+    ],
+    nod:[
+      "YES! FEED THE UNTAMED CHAOS MATRIX!",
+      "Glorious! Absolutely beautiful, unhinged run!",
+      "I highly respect this deep level of insanity.",
+      "RIDE OR DIE! No calculations can hold us!",
+      "THE CHAOS GOBLIN IS SATISFIED WITH THIS REJECTION!",
+      "Let's see something catch fire next!",
+      "Gamble gamble gamble! No nets!"
+    ],
     rate:1.38, pitch:1.55
   }
 };
@@ -597,7 +699,7 @@ const Snd = (() => {
           if(!musOn)return;
           chords[ci++%chords.length].forEach(f=>{
             const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;
-            g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.012,ctx.currentTime+0.5);
+            g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.012,ctx.currentTime+0.45);
             g.gain.setValueAtTime(0.012,ctx.currentTime+2.2);g.gain.linearRampToValueAtTime(0,ctx.currentTime+3);
             o.connect(g);g.connect(mus);o.start();o.stop(ctx.currentTime+3.1);
           });
@@ -675,8 +777,16 @@ function updateNeonPillars(color) {
 }
 
 // ═══════════════════════════════════════════════════
-//  CORE INITIALIZATION
+//  INITIALIZATION ROUTINES
 // ═══════════════════════════════════════════════════
+function dismissWelcomeAndBootAudio() {
+    closeM('welcomeM');
+    try {
+        Snd.boot();
+        Snd.startMusic();
+    } catch(e) { console.warn("Initial music loop trigger delayed."); }
+}
+
 function init(){
   boxes=[...VALUES].sort(()=>Math.random()-0.5).map(v=>({value:v,open:false}));
   $('bg').innerHTML='';$('vbL').innerHTML='';$('vbR').innerHTML='';
@@ -749,7 +859,7 @@ function handleBoxClick(i, el) {
     el.classList.add('mine');
     el.innerHTML = `<span class="bn">${i+1}</span><span class="bl" style="color:#ffd700">YOURS</span>`;
     document.querySelectorAll('.pb').forEach(b => b.disabled = true);
-    try { Snd.boot(); Snd.startMusic(); } catch(audioErr){}
+    try { Snd.boot(); } catch(audioErr){}
     startRound();
     $('btxt').textContent = `📦 Briefcase ${i+1} locked. Clear the remaining cases to trigger offers.`;
     return;
@@ -775,7 +885,6 @@ function handleBoxClick(i, el) {
   el.classList.add('flipping');
   try { Snd.boxOpen(clickedValue); } catch(err){}
 
-  // Standardized Studio Suspense Flash
   const flash = $('flashOverlay');
   if(clickedValue >= 1000) {
       if(flash) flash.className = 'flash-red';
@@ -785,7 +894,6 @@ function handleBoxClick(i, el) {
       updateNeonPillars('#007aff');
   }
 
-  // Universal Suspense Placeholder Tag
   el.classList.add('suspense-wait');
   el.innerHTML = `<span class="bn">...</span><span class="bl">WAIT</span>`;
   try { Snd.drumRoll(1.8); } catch(err){}
@@ -817,13 +925,11 @@ function finalizeReveal(el, val, col, evBef, maxBef) {
     goblinTrig(evBef, evAft, val);
     analystTrig();
 
-    // Check if configuration calls for transition to final phase
     const rr = rem().map(x => x.i);
     
     if(opensLeft <= 0) {
       if(!offerLive && !roundSat) {
         roundSat = true;
-        // Delay scheduled banker call slightly to let result settle
         setTimeout(function() { 
             if(rr.length === 2) enterFinal(rr);
             else bankerCall('scheduled', `Round ${roundIdx - 1} Complete`); 
@@ -1005,25 +1111,21 @@ function initiateCounter() {
         const maxThreshold = Math.max(ev * 0.95, nativeBackupOffer * 1.12);
         
         if(amount <= maxThreshold) {
-            // ACCEPTED COUNTER CONDITION
             $('btxt').textContent = `The Banker has accepted your counter offer conditions!`;
             Say.speak("Deal settled.", curP);
             curOffer = amount;
             acceptDeal();
         } else {
-            // REJECTED COUNTER PROTOCOL: AI Branching Logic Execution
             react('groan');
             const choiceRoll = Math.random();
             
             if(choiceRoll < 0.40) {
-                // Choice A: Reoffer Baseline Native Sum
                 curOffer = nativeBackupOffer; lastOffer = nativeBackupOffer;
-                $('btxt').textContent = `The Banker rejected your ${fmt(amount)} counter.\nHowever, they choose to hold their original offer of ${fmt(nativeBackupOffer)} on table!`;
+                $('btxt').textContent = `The Banker rejected your ${fmt(amount)} counter.\nHowever, they choose to hold their original offer of ${fmt(nativeBackupOffer)} on the table!`;
                 Say.speak("My original offer stands.", curP);
                 startTimer(10000); 
             } 
             else if(choiceRoll < 0.80) {
-                // Choice B: Punitive Offer Slashing
                 const slashedOffer = Math.round(nativeBackupOffer * rand(0.65, 0.82));
                 curOffer = slashedOffer; lastOffer = slashedOffer;
                 $('oamt').textContent = fmt(slashedOffer);
@@ -1032,7 +1134,6 @@ function initiateCounter() {
                 startTimer(10000);
             } 
             else {
-                // Choice C: Absolute Offer Rescission
                 resetBanker();
                 $('btxt').textContent = `The Banker rejects ${fmt(amount)} and has completely RESCINDED their offer! The phone slammed down.`;
                 Say.speak("No deal. Off the table.", curP);
@@ -1110,14 +1211,21 @@ function endDeal(deal){
   recordGameStats(deal, good);
   if(good){confetti();react('applause')}else react('groan');
   
+  let evaluationHeadline = good ? "🏆 SPECTACULAR DEFEAT OF THE SHOW!" : "😬 THE BANKER GOT AWAY WITH IT!";
+  let evaluationSummaryText = good 
+    ? `Incredible job! You walked away with <b>${fmt(deal)}</b>, but your briefcase only held <b>${fmt(bv)}</b>. You forced the Banker to pay out more than your case was worth!` 
+    : `Ouch! You settled out for <b>${fmt(deal)}</b>, but your actual briefcase secretly held a massive <b>${fmt(bv)}</b>. The Banker bought you out at a bargain rate!`;
+
   $('endT').textContent='🤝 DEAL AGREED';
   $('endB').innerHTML=`
     <div class="big-r ${good?'good':'bad'}">${fmt(deal)}</div>
+    <h3 style="text-align:center; font-size:16px; margin: 5px 0 15px; letter-spacing:0.05em; color: ${good?'#4ee864':'#ff4f4f'}; font-weight:900;">${evaluationHeadline}</h3>
+    <p style="font-size:14px; text-align:center; line-height:1.5; margin-bottom:15px; color:rgba(255,255,255,0.85);">${evaluationSummaryText}</p>
     <div class="kv">
-      <div class="kr"><b>Acquired Settlement Winnings:</b> ${fmt(deal)}</div>
-      <div class="kr"><b>Content of Your Briefcase:</b> ${fmt(bv)}</div>
-      <div class="kr"><b>Expected Value Benchmarking:</b> ${fmt(e)}</div>
-      <div class="kr"><b>Efficiency:</b> ${pct}% of fair value</div>
+      <div class="kr"><b>Your Final Settlement Check:</b> ${fmt(deal)}</div>
+      <div class="kr"><b>Secret Prize Inside Your Case:</b> ${fmt(bv)}</div>
+      <div class="kr"><b>Fair Statistical Value (EV):</b> ${fmt(e)}</div>
+      <div class="kr"><b>Banker Deal Efficiency Profile:</b> ${pct}% of EV Matrix</div>
     </div>`;
   $('endM').classList.remove('hidden');
 }
@@ -1129,14 +1237,21 @@ function endNoDeal(swapped,fi,fv,ov,lo){
   recordGameStats(fv, fv > lo);
   if(good){confetti();react('applause')}else react('groan');
   
+  let evaluationHeadline = good ? "🎉 ABSOLUTE TRIUMPH IN THE FINALS!" : "😔 CRUSHING FINAL DROP...";
+  let evaluationSummaryText = good
+    ? `Brave execution! You held onto your positioning and uncovered a massive <b>${fmt(fv)}</b> box, completely outperforming the alternative floor value of <b>${fmt(ov)}</b>!`
+    : `A painful final card. Your selected active box held a meager <b>${fmt(fv)}</b>, while the alternative remaining case mocked you with <b>${fmt(ov)}</b>. High-stakes gaming at its rawest.`;
+
   $('endT').textContent='🔥 LIVE REVEAL COMPLETE';
   $('endB').innerHTML=`
     <div class="big-r ${good?'good':'bad'}">${fmt(fv)}</div>
+    <h3 style="text-align:center; font-size:16px; margin: 5px 0 15px; letter-spacing:0.05em; color: ${good?'#4ee864':'#ff4f4f'}; font-weight:900;">${evaluationHeadline}</h3>
+    <p style="font-size:14px; text-align:center; line-height:1.5; margin-bottom:15px; color:rgba(255,255,255,0.85);">${evaluationSummaryText}</p>
     <div class="kv">
-      <div class="kr"><b>Final Action:</b> ${swapped?'SWAPPED BRIEFCASES 🔀':'RETAINED NATIVE CHOICE'}</div>
-      <div class="kr"><b>Opened Case Value (#${fi+1}):</b> ${fmt(fv)}</div>
-      <div class="kr"><b>Alternative Case Content:</b> ${fmt(ov)}</div>
-      <div class="kr"><b>Final Banker Offer Refused:</b> ${lo?fmt(lo):'—'}</div>
+      <div class="kr"><b>Final Desktop Action:</b> ${swapped?'SWAPPED BRIEFCASES 🔀':'RETAINED NATIVE CHOICE'}</div>
+      <div class="kr"><b>Revealed Briefcase Payload Value (#${fi+1}):</b> ${fmt(fv)}</div>
+      <div class="kr"><b>Alternative Leftover Value on Floor:</b> ${fmt(ov)}</div>
+      <div class="kr"><b>Final Refused Banker Offer:</b> ${lo?fmt(lo):'—'}</div>
     </div>`;
   $('endM').classList.remove('hidden');
 }
@@ -1151,15 +1266,21 @@ function confetti(){
 }
 
 // ═══════════════════════════════════════════════════
-//  MODAL SYSTEMS
+//  MODAL SYSTEM PRESENTERS
 // ═══════════════════════════════════════════════════
 $('evhBtn').addEventListener('click',function(){
   const r=remV(),sum=r.reduce((a,b)=>a+b,0),avg=r.length?sum/r.length:0;
   $('evB').innerHTML=`
-    <p><b>Expected Value (EV)</b> calculates the raw statistical average of all prizes left on the floor layout matrix.</p>
-    <div class="kv">
-      <div class="kr"><b>Formula:</b> Total Aggregated Cash ÷ Remaining Briefcases</div>
-      <div class="kr"><b>Active Equation:</b> ${fmt(sum)} ÷ ${r.length} = <b>${fmt(avg)}</b></div>
+    <p style="font-size:15px; line-height:1.5; margin-bottom:12px;"> Imagine you have a bag with 3 juice boxes in it. One juice box has <b>£0</b> written on it, one has <b>£10</b>, and the big one has <b>£100</b>!</p>
+    <p style="font-size:15px; line-height:1.5; margin-bottom:12px;">If you blindly reach your hand into the bag, what is your fair reward? To find out, we just do a simple trick: <b>Add all the cash together, then share it evenly among the boxes!</b></p>
+    <div class="kv" style="background:rgba(255,215,0,0.04); border-color:rgba(255,215,0,0.2);">
+      <div class="kr"><b>1. Add them up:</b> £0 + £10 + £100 = <b>£110 total cash</b></div>
+      <div class="kr"><b>2. Share it out:</b> £110 divided among 3 boxes = <b>£36.66 each!</b></div>
+    </div>
+    <p style="font-size:14px; color:rgba(255,255,255,0.75); line-height:1.5;">So, <b>£36.66</b> is the fair target! If the Banker offers you MORE than that, they are being generous. If they offer LESS, they are hoping you get scared and take a bad trade!</p>
+    <div class="kv" style="margin-top:15px;">
+      <div class="kr" style="color:var(--accent);"><b>Active Live Math Equation Right Now:</b></div>
+      <div class="kr">Total Cash Left: ${fmt(sum)} shared across ${r.length} Briefcases = <b>${fmt(avg)}</b></div>
     </div>`;
   $('evM').classList.remove('hidden');
 });
@@ -1201,10 +1322,9 @@ function clearStats() {
 
 function closeM(id){$(id).classList.add('hidden')}
 
-// Locked background clicks bypass logic for results presentation layout safety
 document.querySelectorAll('.modal').forEach(m=>{
     m.addEventListener('click',e=>{
-        if(e.target===m && m.id !== 'endM') m.classList.add('hidden');
+        if(e.target===m && m.id !== 'endM' && m.id !== 'welcomeM') m.classList.add('hidden');
     })
 });
 
