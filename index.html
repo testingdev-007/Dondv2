@@ -582,12 +582,11 @@ const PERSONAS = {
     },
     maxCalls:11, plan:[6,4,3,2,2,1,1,1,1], chaos:true,
     pre:[
-      "I FELT that structural shift deep in my SOUL!",
+      "I FELT that shift in my SOUL!",
       "The absolute chaos deities are screaming out!",
       "oooOOOOOoooo, look at those colors spin!",
       "MASSIVE erratic static energy inside the showroom!",
-      "I am literally vibrating over these targets!",
-      "YES YES YES, blow the whole deck wide open!",
+      "I am literally vibrating over here.","YES YES YES, blow the whole deck wide open!",
       "Who needs safe cards when you have madness?!",
       "I am cackling at this board setup right now!"
     ],
@@ -777,14 +776,16 @@ function updateNeonPillars(color) {
 }
 
 // ═══════════════════════════════════════════════════
-//  INITIALIZATION ROUTINES
+//  CORE INITIALIZATION ROUTINES
 // ═══════════════════════════════════════════════════
 function dismissWelcomeAndBootAudio() {
     closeM('welcomeM');
     try {
         Snd.boot();
         Snd.startMusic();
-    } catch(e) { console.warn("Initial music loop trigger delayed."); }
+    } catch(e) { console.warn("Initial audio chain context delayed."); }
+    // Construct layout directly after audio validation event
+    init();
 }
 
 function init(){
@@ -859,15 +860,12 @@ function handleBoxClick(i, el) {
     el.classList.add('mine');
     el.innerHTML = `<span class="bn">${i+1}</span><span class="bl" style="color:#ffd700">YOURS</span>`;
     document.querySelectorAll('.pb').forEach(b => b.disabled = true);
-    try { Snd.boot(); } catch(audioErr){}
     startRound();
     $('btxt').textContent = `📦 Briefcase ${i+1} locked. Clear the remaining cases to trigger offers.`;
     return;
   }
 
   if(i === player || opensLeft <= 0) return;
-
-  try { Snd.boot(); } catch(err){}
 
   const evBef = calcEV();
   const maxBef = Math.max(...remV());
@@ -1167,6 +1165,9 @@ function enterFinal(twoIdx){
   }
 }
 
+// ═══════════════════════════════════════════════════
+//  STATS AND REPORTS
+// ═══════════════════════════════════════════════════
 function showSwap(){
   swapPend=true;const e=lastEV??calcEV();
   $('swapB').innerHTML=`
@@ -1191,9 +1192,6 @@ function finalSwap(doSwap){
   },2500);
 }
 
-// ═══════════════════════════════════════════════════
-//  STATS RETENTION MANAGEMENT
-// ═══════════════════════════════════════════════════
 function recordGameStats(winnings, isWin) {
     userStats.gamesPlayed++;
     userStats.totalWinnings += winnings;
@@ -1204,17 +1202,18 @@ function recordGameStats(winnings, isWin) {
 
 function endDeal(deal){
   ended=true; offerLive=false; try{Snd.stopMusic();}catch(e){}
-  const bv=boxes[player].value,e=lastEV??calcEV();
+  const fValue = boxes[player].value;
+  const e=lastEV??calcEV();
   const pct=e ? Math.round(deal/e*100) : 100;
-  const good=deal>=bv;
+  const good=deal>=fValue;
   
   recordGameStats(deal, good);
   if(good){confetti();react('applause')}else react('groan');
   
   let evaluationHeadline = good ? "🏆 SPECTACULAR DEFEAT OF THE SHOW!" : "😬 THE BANKER GOT AWAY WITH IT!";
   let evaluationSummaryText = good 
-    ? `Incredible job! You walked away with <b>${fmt(deal)}</b>, but your briefcase only held <b>${fmt(bv)}</b>. You forced the Banker to pay out more than your case was worth!` 
-    : `Ouch! You settled out for <b>${fmt(deal)}</b>, but your actual briefcase secretly held a massive <b>${fmt(bv)}</b>. The Banker bought you out at a bargain rate!`;
+    ? `Incredible job! You walked away with <b>${fmt(deal)}</b>, but your briefcase only held <b>${fmt(fValue)}</b>. You forced the Banker to pay out more than your case was worth!` 
+    : `Ouch! You settled out for <b>${fmt(deal)}</b>, but your actual briefcase secretly held a massive <b>${fmt(fValue)}</b>. The Banker bought you out at a bargain rate!`;
 
   $('endT').textContent='🤝 DEAL AGREED';
   $('endB').innerHTML=`
@@ -1223,7 +1222,7 @@ function endDeal(deal){
     <p style="font-size:14px; text-align:center; line-height:1.5; margin-bottom:15px; color:rgba(255,255,255,0.85);">${evaluationSummaryText}</p>
     <div class="kv">
       <div class="kr"><b>Your Final Settlement Check:</b> ${fmt(deal)}</div>
-      <div class="kr"><b>Secret Prize Inside Your Case:</b> ${fmt(bv)}</div>
+      <div class="kr"><b>Secret Prize Inside Your Case:</b> ${fmt(fValue)}</div>
       <div class="kr"><b>Fair Statistical Value (EV):</b> ${fmt(e)}</div>
       <div class="kr"><b>Banker Deal Efficiency Profile:</b> ${pct}% of EV Matrix</div>
     </div>`;
@@ -1240,7 +1239,7 @@ function endNoDeal(swapped,fi,fv,ov,lo){
   let evaluationHeadline = good ? "🎉 ABSOLUTE TRIUMPH IN THE FINALS!" : "😔 CRUSHING FINAL DROP...";
   let evaluationSummaryText = good
     ? `Brave execution! You held onto your positioning and uncovered a massive <b>${fmt(fv)}</b> box, completely outperforming the alternative floor value of <b>${fmt(ov)}</b>!`
-    : `A painful final card. Your selected active box held a meager <b>${fmt(fv)}</b>, while the alternative remaining case mocked you with <b>${fmt(ov)}</b>. High-stakes gaming at its rawest.`;
+    : `A painful final card. Your selected active box held a legacy <b>${fmt(fv)}</b>, while the alternative remaining case mocked you with <b>${fmt(ov)}</b>. High-stakes gaming at its rawest.`;
 
   $('endT').textContent='🔥 LIVE REVEAL COMPLETE';
   $('endB').innerHTML=`
@@ -1248,10 +1247,10 @@ function endNoDeal(swapped,fi,fv,ov,lo){
     <h3 style="text-align:center; font-size:16px; margin: 5px 0 15px; letter-spacing:0.05em; color: ${good?'#4ee864':'#ff4f4f'}; font-weight:900;">${evaluationHeadline}</h3>
     <p style="font-size:14px; text-align:center; line-height:1.5; margin-bottom:15px; color:rgba(255,255,255,0.85);">${evaluationSummaryText}</p>
     <div class="kv">
-      <div class="kr"><b>Final Desktop Action:</b> ${swapped?'SWAPPED BRIEFCASES 🔀':'RETAINED NATIVE CHOICE'}</div>
-      <div class="kr"><b>Revealed Briefcase Payload Value (#${fi+1}):</b> ${fmt(fv)}</div>
-      <div class="kr"><b>Alternative Leftover Value on Floor:</b> ${fmt(ov)}</div>
-      <div class="kr"><b>Final Refused Banker Offer:</b> ${lo?fmt(lo):'—'}</div>
+      <div class="kr"><b>Final Action:</b> ${swapped?'SWAPPED BRIEFCASES 🔀':'RETAINED NATIVE CHOICE'}</div>
+      <div class="kr"><b>Opened Case Value (#${fi+1}):</b> ${fmt(fv)}</div>
+      <div class="kr"><b>Alternative Case Content:</b> ${fmt(ov)}</div>
+      <div class="kr"><b>Final Banker Offer Refused:</b> ${lo?fmt(lo):'—'}</div>
     </div>`;
   $('endM').classList.remove('hidden');
 }
@@ -1266,7 +1265,7 @@ function confetti(){
 }
 
 // ═══════════════════════════════════════════════════
-//  MODAL SYSTEM PRESENTERS
+//  MODAL SYSTEMS
 // ═══════════════════════════════════════════════════
 $('evhBtn').addEventListener('click',function(){
   const r=remV(),sum=r.reduce((a,b)=>a+b,0),avg=r.length?sum/r.length:0;
@@ -1327,8 +1326,6 @@ document.querySelectorAll('.modal').forEach(m=>{
         if(e.target===m && m.id !== 'endM' && m.id !== 'welcomeM') m.classList.add('hidden');
     })
 });
-
-window.onload = function() { init(); };
 </script>
 </body>
 </html>
