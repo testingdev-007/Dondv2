@@ -399,12 +399,10 @@ body.calling #dimmer{background:rgba(0,0,0,0.65)}
 
 <div id="endM" class="modal hidden">
   <div class="mc">
-    <div class="mh"><h2 id="endT">RESULT</h2><button class="mx" onclick="closeM('endM')">×</button></div>
+    <div class="mh"><h2>FINAL BROADCAST RESULT</h2></div>
     <div id="endB"></div>
     <div class="mbtns">
-      <button class="mbtn gold" onclick="location.reload()">▶ Play Again</button>
-      <button class="mbtn" onclick="openAnalysis()">📊 Analysis</button>
-      <button class="mbtn" onclick="openStats()">🏆 Stats</button>
+      <button class="mbtn gold" onclick="location.reload()" style="font-size: 16px; padding: 14px 20px;">▶ Play Again</button>
     </div>
   </div>
 </div>
@@ -516,7 +514,7 @@ const LOW_V =[0.01, 0.1, 0.5, 1, 5, 10, 50, 100, 250, 500, 750];
 const HIGH_V=[1000, 3000, 5000, 10000, 15000, 20000, 35000, 50000, 75000, 100000, 250000];
 
 // ═══════════════════════════════════════════════════
-//  FAIL-SAFE ROUTER AUDIO CONTROLLER
+//  FAIL-SAFE AUDIO ENGINE
 // ═══════════════════════════════════════════════════
 const Snd = (() => {
   let ctx=null,master=null,sfx=null,aud=null,mus=null,musOn=false,muted=false,hbInterval=null;
@@ -531,7 +529,7 @@ const Snd = (() => {
       sfx=ctx.createGain();sfx.gain.value=1;sfx.connect(master);
       aud=ctx.createGain();aud.gain.value=0.42;aud.connect(master);
       mus=ctx.createGain();mus.gain.value=0;mus.connect(master);
-    } catch(e) { console.warn("Audio architecture launch blocked or unsupported.", e); }
+    } catch(e) { console.warn("Audio Context blocked.", e); }
   }
 
   function t(f,type,vol,dur,t0=0){
@@ -677,7 +675,7 @@ function updateNeonPillars(color) {
 }
 
 // ═══════════════════════════════════════════════════
-//  CORE REFRESH INITIALIZATION
+//  CORE INITIALIZATION
 // ═══════════════════════════════════════════════════
 function init(){
   boxes=[...VALUES].sort(()=>Math.random()-0.5).map(v=>({value:v,open:false}));
@@ -696,7 +694,6 @@ function init(){
     el.tabIndex = 0;
     el.innerHTML = `<span class="bn">${i+1}</span><span class="bl">BOX</span>`;
     
-    // Explicit anonymous functions to prevent context breaking inside listener passes
     el.onclick = function() { handleBoxClick(i, el); };
     el.onkeydown = function(e) { if(e.key==='Enter'||e.key===' ') handleBoxClick(i, el); };
     
@@ -741,22 +738,18 @@ function drawPips(){
 }
 
 // ═══════════════════════════════════════════════════
-//  ISOLATED SAFE CLICK ENGINE
+//  HIGH TENSION CLICK ENGINE (ALL BOXES SUSPENSE)
 // ═══════════════════════════════════════════════════
 function handleBoxClick(i, el) {
   if(offerLive || ended || swapPend || finalSt) return;
   if(boxes[i].open) return;
 
-  // 1. Establish player selection profile
   if(player === null) {
     player = i;
     el.classList.add('mine');
     el.innerHTML = `<span class="bn">${i+1}</span><span class="bl" style="color:#ffd700">YOURS</span>`;
     document.querySelectorAll('.pb').forEach(b => b.disabled = true);
-    
-    // Fail-safe background engine activation after structural registration
     try { Snd.boot(); Snd.startMusic(); } catch(audioErr){}
-    
     startRound();
     $('btxt').textContent = `📦 Briefcase ${i+1} locked. Clear the remaining cases to trigger offers.`;
     return;
@@ -764,7 +757,6 @@ function handleBoxClick(i, el) {
 
   if(i === player || opensLeft <= 0) return;
 
-  // 2. Process open case variables using functional isolation
   try { Snd.boot(); } catch(err){}
 
   const evBef = calcEV();
@@ -783,22 +775,24 @@ function handleBoxClick(i, el) {
   el.classList.add('flipping');
   try { Snd.boxOpen(clickedValue); } catch(err){}
 
-  if(clickedValue >= 50000) {
-      const flash = $('flashOverlay');
+  // Standardized Studio Suspense Flash
+  const flash = $('flashOverlay');
+  if(clickedValue >= 1000) {
       if(flash) flash.className = 'flash-red';
       updateNeonPillars('#ff3b30');
-      el.classList.add('suspense-wait');
-      el.innerHTML = `<span class="bn">...</span><span class="bl">WAIT</span>`;
-      try { Snd.drumRoll(2.0); } catch(err){}
-      setTimeout(function() { finalizeReveal(el, clickedValue, itemColor, evBef, maxBef); }, 2000);
   } else {
-      if (clickedValue <= 1) {
-          const flash = $('flashOverlay');
-          if(flash) flash.className = 'flash-blue';
-          updateNeonPillars('#007aff');
-      }
-      setTimeout(function() { finalizeReveal(el, clickedValue, itemColor, evBef, maxBef); }, 4000);
+      if(flash) flash.className = 'flash-blue';
+      updateNeonPillars('#007aff');
   }
+
+  // Universal Suspense Placeholder Tag
+  el.classList.add('suspense-wait');
+  el.innerHTML = `<span class="bn">...</span><span class="bl">WAIT</span>`;
+  try { Snd.drumRoll(1.8); } catch(err){}
+  
+  setTimeout(function() { 
+      finalizeReveal(el, clickedValue, itemColor, evBef, maxBef); 
+  }, 1800);
 }
 
 function finalizeReveal(el, val, col, evBef, maxBef) {
@@ -823,18 +817,24 @@ function finalizeReveal(el, val, col, evBef, maxBef) {
     goblinTrig(evBef, evAft, val);
     analystTrig();
 
+    // Check if configuration calls for transition to final phase
+    const rr = rem().map(x => x.i);
+    
     if(opensLeft <= 0) {
       if(!offerLive && !roundSat) {
         roundSat = true;
-        setTimeout(function() { bankerCall('scheduled', `Round ${roundIdx - 1} Complete`); }, 600);
+        // Delay scheduled banker call slightly to let result settle
+        setTimeout(function() { 
+            if(rr.length === 2) enterFinal(rr);
+            else bankerCall('scheduled', `Round ${roundIdx - 1} Complete`); 
+        }, 800);
       }
-    }
-    
-    const rr = rem().map(x => x.i);
-    if(rr.length === 2 && !offerLive) {
-        enterFinal(rr);
-    } else if(opensLeft > 0 && rem().length > 2) {
-        $('stTxt').textContent = `Round ${roundIdx} · Open ${opensLeft} box${opensLeft>1?'es':''}`;
+    } else {
+       if(rr.length === 2 && !offerLive) {
+           enterFinal(rr);
+       } else if(opensLeft > 0 && rem().length > 2) {
+           $('stTxt').textContent = `Round ${roundIdx} · Open ${opensLeft} box${opensLeft>1?'es':''}`;
+       }
     }
 }
 
@@ -880,16 +880,15 @@ function analystTrig(){
 }
 
 // ═══════════════════════════════════════════════════
-//  BANKER TRANSMISSION SYSTEM
+//  BANKER TRANSMISSION LAYER
 // ═══════════════════════════════════════════════════
 function bankerCall(type,reason){
   if(ended||player===null)return;
-  if(type!=='final'&&finalSt)return;
-  const p=pers();if(callCt>=p.maxCalls)return;
+  if(type!=='final' && finalSt) return;
   
   offerLive=true;
   const e=calcEV();lastEV=e;
-  const offer=p.getOffer(e,rem().length,callCt);
+  const offer=pers().getOffer(e,rem().length,callCt);
   curOffer=offer;lastOffer=offer;callCt++;lastCallOpen=opened;
   hist.push({callNo:callCt,type,reason,persona:curP,boxesL:rem().length,ev:e,offer,decision:'(pending)'});
 
@@ -898,7 +897,7 @@ function bankerCall(type,reason){
   $('bp').classList.add('ring');
   try{Snd.phone();}catch(ex){}
 
-  const preMsg=rnd(p.pre)+'\n'+rnd(p.lead);
+  const preMsg=rnd(pers().pre)+'\n'+rnd(pers().lead);
 
   setTimeout(function() {
     $('phone').classList.remove('up');
@@ -934,7 +933,7 @@ function animOffer(target,ms=1380){
 }
 
 // ═══════════════════════════════════════════════════
-//  HUD INTERFACES & REPLYS
+//  TIMERS & HANDLERS
 // ═══════════════════════════════════════════════════
 function startTimer(ms=15000){
   const f=$('tfill');f.style.transition='none';f.style.width='0%';
@@ -958,10 +957,11 @@ function resetBanker(){
 
 function acceptDeal(){
   if(ended||!offerLive)return;
+  const settlementValue = curOffer || lastOffer;
   resetBanker();Say.stop();
   try{Snd.deal();Snd.applause(3.5);}catch(e){}
   const last=hist[hist.length-1];if(last&&last.decision==='(pending)')last.decision='DEAL';
-  setTimeout(function() { endDeal(curOffer||lastOffer); },600);
+  setTimeout(function() { endDeal(settlementValue); },600);
 }
 
 function declineDeal(){
@@ -969,6 +969,7 @@ function declineDeal(){
   resetBanker();Say.stop();
   try{Snd.nodeal();Snd.cheer(1.5);}catch(e){}
   const last=hist[hist.length-1];if(last&&last.decision==='(pending)')last.decision='NO DEAL';
+  
   const nd=rnd(pers().nod);$('btxt').textContent=nd;Say.speak(nd,curP);
   
   if(rem().length === 2) {
@@ -978,6 +979,9 @@ function declineDeal(){
   }
 }
 
+// ═══════════════════════════════════════════════════
+//  ADVANCED BANKER COUNTER ENGINE STATE MACHINE
+// ═══════════════════════════════════════════════════
 function initiateCounter() {
     if(ended||!offerLive||!counterAvailable)return;
     const req = prompt("Type your strict counter-offer demand (Numbers only):");
@@ -990,25 +994,59 @@ function initiateCounter() {
     $('btnCounter').style.display='none';
     stopTimer();
     
+    const nativeBackupOffer = curOffer || lastOffer;
     $('btxt').textContent = `Submitting a counter demand of ${fmt(amount)} straight to the Banker box...`;
     $('bp').classList.add('ring');
-    try{Snd.phone(); Snd.drumRoll(2);}catch(e){}
+    try{Snd.phone(); Snd.drumRoll(2.2);}catch(e){}
     
     setTimeout(function() {
         $('bp').classList.remove('ring');
         const ev = lastEV || calcEV();
-        const maxThreshold = Math.max(ev * 0.95, (curOffer||lastOffer) * 1.12);
+        const maxThreshold = Math.max(ev * 0.95, nativeBackupOffer * 1.12);
         
         if(amount <= maxThreshold) {
+            // ACCEPTED COUNTER CONDITION
             $('btxt').textContent = `The Banker has accepted your counter offer conditions!`;
             Say.speak("Deal settled.", curP);
             curOffer = amount;
             acceptDeal();
         } else {
-            $('btxt').textContent = `The Banker rejected ${fmt(amount)} immediately. Decision required on native parameters.`;
-            Say.speak("No chance.", curP);
+            // REJECTED COUNTER PROTOCOL: AI Branching Logic Execution
             react('groan');
-            startTimer(8000);
+            const choiceRoll = Math.random();
+            
+            if(choiceRoll < 0.40) {
+                // Choice A: Reoffer Baseline Native Sum
+                curOffer = nativeBackupOffer; lastOffer = nativeBackupOffer;
+                $('btxt').textContent = `The Banker rejected your ${fmt(amount)} counter.\nHowever, they choose to hold their original offer of ${fmt(nativeBackupOffer)} on table!`;
+                Say.speak("My original offer stands.", curP);
+                startTimer(10000); 
+            } 
+            else if(choiceRoll < 0.80) {
+                // Choice B: Punitive Offer Slashing
+                const slashedOffer = Math.round(nativeBackupOffer * rand(0.65, 0.82));
+                curOffer = slashedOffer; lastOffer = slashedOffer;
+                $('oamt').textContent = fmt(slashedOffer);
+                $('btxt').textContent = `The Banker is insulted by your counter. They reject ${fmt(amount)} and punish you by lowering the offer to ${fmt(slashedOffer)}!`;
+                Say.speak("Take this penalty discount or leave it.", curP);
+                startTimer(10000);
+            } 
+            else {
+                // Choice C: Absolute Offer Rescission
+                resetBanker();
+                $('btxt').textContent = `The Banker rejects ${fmt(amount)} and has completely RESCINDED their offer! The phone slammed down.`;
+                Say.speak("No deal. Off the table.", curP);
+                
+                setTimeout(function() {
+                    if(rem().length === 2) {
+                        enterFinal(rem().map(x=>x.i));
+                    } else if(opensLeft <= 0) {
+                        startRound();
+                    } else {
+                        $('stTxt').textContent = `Round ${roundIdx} · Open ${opensLeft} box${opensLeft>1?'es':''}`;
+                    }
+                }, 2200);
+            }
         }
     }, 2200);
 }
@@ -1065,8 +1103,9 @@ function recordGameStats(winnings, isWin) {
 
 function endDeal(deal){
   ended=true; offerLive=false; try{Snd.stopMusic();}catch(e){}
-  const bv=boxes[player].value,e=lastEV??calcEV(),d=Math.round(deal-e);
-  const pct=e?Math.round(deal/e*100):null,good=deal>=bv;
+  const bv=boxes[player].value,e=lastEV??calcEV();
+  const pct=e ? Math.round(deal/e*100) : 100;
+  const good=deal>=bv;
   
   recordGameStats(deal, good);
   if(good){confetti();react('applause')}else react('groan');
@@ -1078,19 +1117,19 @@ function endDeal(deal){
       <div class="kr"><b>Acquired Settlement Winnings:</b> ${fmt(deal)}</div>
       <div class="kr"><b>Content of Your Briefcase:</b> ${fmt(bv)}</div>
       <div class="kr"><b>Expected Value Benchmarking:</b> ${fmt(e)}</div>
-      <div class="kr"><b>Efficiency:</b> ${pct??'—'}% of fair value</div>
+      <div class="kr"><b>Efficiency:</b> ${pct}% of fair value</div>
     </div>`;
   $('endM').classList.remove('hidden');
 }
 
 function endNoDeal(swapped,fi,fv,ov,lo){
   ended=true; offerLive=false; try{Snd.stopMusic();}catch(e){}
-  const e=lastEV??calcEV(),d=Math.round(fv-e),good=fv>=ov;
+  const e=lastEV??calcEV(),good=fv>=ov;
   
   recordGameStats(fv, fv > lo);
   if(good){confetti();react('applause')}else react('groan');
   
-  $('endT').textContent='🔥 LIVE REVEAL BOX COMPLETED';
+  $('endT').textContent='🔥 LIVE REVEAL COMPLETE';
   $('endB').innerHTML=`
     <div class="big-r ${good?'good':'bad'}">${fmt(fv)}</div>
     <div class="kv">
@@ -1112,7 +1151,7 @@ function confetti(){
 }
 
 // ═══════════════════════════════════════════════════
-//  MODAL SYSTEM PRESENTERS
+//  MODAL SYSTEMS
 // ═══════════════════════════════════════════════════
 $('evhBtn').addEventListener('click',function(){
   const r=remV(),sum=r.reduce((a,b)=>a+b,0),avg=r.length?sum/r.length:0;
@@ -1161,9 +1200,14 @@ function clearStats() {
 }
 
 function closeM(id){$(id).classList.add('hidden')}
-document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden')})});
 
-// Run initialization safely on load
+// Locked background clicks bypass logic for results presentation layout safety
+document.querySelectorAll('.modal').forEach(m=>{
+    m.addEventListener('click',e=>{
+        if(e.target===m && m.id !== 'endM') m.classList.add('hidden');
+    })
+});
+
 window.onload = function() { init(); };
 </script>
 </body>
