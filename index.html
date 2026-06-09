@@ -53,7 +53,8 @@ body::after {
 }
 #flashOverlay.flash-red { background: #ff2233; animation: flashTrigger 0.5s ease-out forwards; }
 #flashOverlay.flash-blue { background: #2266ff; animation: flashTrigger 0.5s ease-out forwards; }
-@keyframes flashTrigger { 0% { opacity: 0.45; } 100% { opacity: 0; } }
+#flashOverlay.flash-gold { background: #ffd700; animation: flashTrigger 0.8s ease-out forwards; }
+@keyframes flashTrigger { 0% { opacity: 0.5; } 100% { opacity: 0; } }
 
 /* ── HEADER ── */
 #hd{position:relative;z-index:10;text-align:center;padding:24px 20px 10px}
@@ -399,17 +400,17 @@ body.calling #dimmer{background:rgba(0,0,0,0.65)}
 
 <div id="welcomeM" class="modal">
   <div class="mc" style="text-align: center; padding: 35px 25px;">
-    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--accent); margin-bottom: 10px;">WELCOME TO THE STUDIO!</h2>
-    <p style="font-size: 16px; rgba(255,255,255,0.85); line-height: 1.6; margin-bottom: 25px;">
+    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 46px; color: var(--accent); margin-bottom: 10px; letter-spacing:0.05em; text-shadow:0 0 20px rgba(255,215,0,0.3);">WELCOME TO THE STUDIO</h2>
+    <p style="font-size: 16px; color:rgba(255,255,255,0.85); line-height: 1.6; margin-bottom: 30px;">
       Prepare to face off against the hidden figures of risk and fortune. Step onto the main floor, hold onto your case, and prepare your strategies.
     </p>
-    <button class="mbtn gold" onclick="dismissWelcomeAndBootAudio()" style="font-size: 18px; padding: 14px 40px; border-radius: 50px; display: inline-block; width: auto;">🎬 ENTER SHOWROOM</button>
+    <button class="mbtn gold" onclick="dismissWelcomeAndBootAudio()" style="font-size: 18px; padding: 16px 45px; border-radius: 50px; display: inline-block; width: auto; font-weight:900;">🎬 ENTER SHOWROOM</button>
   </div>
 </div>
 
 <div id="endM" class="modal hidden">
   <div class="mc">
-    <div class="mh"><h2>FINAL BROADCAST SUMMARY</h2></div>
+    <div class="mh"><h2 id="endT">FINAL BROADCAST SUMMARY</h2></div>
     <div id="endB"></div>
     <div class="mbtns">
       <button class="mbtn gold" onclick="location.reload()" style="font-size: 16px; padding: 14px 20px;">▶ Play Again</button>
@@ -586,7 +587,8 @@ const PERSONAS = {
       "The absolute chaos deities are screaming out!",
       "oooOOOOOoooo, look at those colors spin!",
       "MASSIVE erratic static energy inside the showroom!",
-      "I am literally vibrating over here.","YES YES YES, blow the whole deck wide open!",
+      "I am literally vibrating over here.",
+      "YES YES YES, blow the whole deck wide open!",
       "Who needs safe cards when you have madness?!",
       "I am cackling at this board setup right now!"
     ],
@@ -784,7 +786,6 @@ function dismissWelcomeAndBootAudio() {
         Snd.boot();
         Snd.startMusic();
     } catch(e) { console.warn("Initial audio chain context delayed."); }
-    // Construct layout directly after audio validation event
     init();
 }
 
@@ -860,12 +861,15 @@ function handleBoxClick(i, el) {
     el.classList.add('mine');
     el.innerHTML = `<span class="bn">${i+1}</span><span class="bl" style="color:#ffd700">YOURS</span>`;
     document.querySelectorAll('.pb').forEach(b => b.disabled = true);
+    try { Snd.boot(); } catch(audioErr){}
     startRound();
     $('btxt').textContent = `📦 Briefcase ${i+1} locked. Clear the remaining cases to trigger offers.`;
     return;
   }
 
   if(i === player || opensLeft <= 0) return;
+
+  try { Snd.boot(); } catch(err){}
 
   const evBef = calcEV();
   const maxBef = Math.max(...remV());
@@ -1166,7 +1170,7 @@ function enterFinal(twoIdx){
 }
 
 // ═══════════════════════════════════════════════════
-//  STATS AND REPORTS
+//  STATS AND REPORTS (WITH NEW DEAL REVEAL SEQUENCE)
 // ═══════════════════════════════════════════════════
 function showSwap(){
   swapPend=true;const e=lastEV??calcEV();
@@ -1201,32 +1205,60 @@ function recordGameStats(winnings, isWin) {
 }
 
 function endDeal(deal){
-  ended=true; offerLive=false; try{Snd.stopMusic();}catch(e){}
+  ended = true; offerLive = false; 
+  try{Snd.stopMusic(); Snd.drumRoll(3.0);}catch(e){}
+  
   const fValue = boxes[player].value;
-  const e=lastEV??calcEV();
-  const pct=e ? Math.round(deal/e*100) : 100;
-  const good=deal>=fValue;
-  
-  recordGameStats(deal, good);
-  if(good){confetti();react('applause')}else react('groan');
-  
-  let evaluationHeadline = good ? "🏆 SPECTACULAR DEFEAT OF THE SHOW!" : "😬 THE BANKER GOT AWAY WITH IT!";
-  let evaluationSummaryText = good 
-    ? `Incredible job! You walked away with <b>${fmt(deal)}</b>, but your briefcase only held <b>${fmt(fValue)}</b>. You forced the Banker to pay out more than your case was worth!` 
-    : `Ouch! You settled out for <b>${fmt(deal)}</b>, but your actual briefcase secretly held a massive <b>${fmt(fValue)}</b>. The Banker bought you out at a bargain rate!`;
+  const e = lastEV ?? calcEV();
+  const pct = e ? Math.round(deal/e*100) : 100;
+  const good = deal >= fValue;
 
-  $('endT').textContent='🤝 DEAL AGREED';
-  $('endB').innerHTML=`
-    <div class="big-r ${good?'good':'bad'}">${fmt(deal)}</div>
-    <h3 style="text-align:center; font-size:16px; margin: 5px 0 15px; letter-spacing:0.05em; color: ${good?'#4ee864':'#ff4f4f'}; font-weight:900;">${evaluationHeadline}</h3>
-    <p style="font-size:14px; text-align:center; line-height:1.5; margin-bottom:15px; color:rgba(255,255,255,0.85);">${evaluationSummaryText}</p>
-    <div class="kv">
-      <div class="kr"><b>Your Final Settlement Check:</b> ${fmt(deal)}</div>
-      <div class="kr"><b>Secret Prize Inside Your Case:</b> ${fmt(fValue)}</div>
-      <div class="kr"><b>Fair Statistical Value (EV):</b> ${fmt(e)}</div>
-      <div class="kr"><b>Banker Deal Efficiency Profile:</b> ${pct}% of EV Matrix</div>
-    </div>`;
-  $('endM').classList.remove('hidden');
+  // 1. Force the dynamic tension sequence on the player's box first
+  $('btxt').textContent = `You guaranteed yourself ${fmt(deal)}! But the game isn't over. Let's see what was secretly waiting inside your personal briefcase all along...`;
+  Say.speak("Let's see what was in your box.", curP);
+  
+  const pBoxEl = document.querySelectorAll('.bx')[player];
+  pBoxEl.classList.add('suspense-wait');
+  pBoxEl.innerHTML = `<span class="bn">...</span><span class="bl">REVEAL</span>`;
+  
+  const flash = $('flashOverlay');
+  if(flash) flash.className = 'flash-gold';
+  updateNeonPillars('#ffd700');
+
+  // 2. Wait for drumroll, flip, and then execute the modal launch
+  setTimeout(function() {
+      pBoxEl.classList.remove('suspense-wait');
+      pBoxEl.classList.add('flipping');
+      
+      setTimeout(function() {
+          pBoxEl.classList.remove('flipping');
+          pBoxEl.classList.add('open');
+          pBoxEl.innerHTML = `<div class="bv" style="color:${vcol(fValue)}; font-size: 16px;">${fmt(fValue)}</div>`;
+          
+          recordGameStats(deal, good);
+          if(good){confetti();react('applause')}else react('groan');
+          
+          let evaluationHeadline = good ? "🏆 SPECTACULAR DEFEAT OF THE SHOW!" : "😬 THE BANKER GOT AWAY WITH IT!";
+          let evaluationSummaryText = good 
+            ? `Incredible job! You walked away with <b>${fmt(deal)}</b>, but your briefcase only held <b>${fmt(fValue)}</b>. You forced the Banker to pay out more than your case was worth!` 
+            : `Ouch! You settled out for <b>${fmt(deal)}</b>, but your actual briefcase secretly held a massive <b>${fmt(fValue)}</b>. The Banker bought you out at a bargain rate!`;
+
+          $('endT').textContent='🤝 DEAL AGREED';
+          $('endB').innerHTML=`
+            <div class="big-r ${good?'good':'bad'}">${fmt(deal)}</div>
+            <h3 style="text-align:center; font-size:16px; margin: 5px 0 15px; letter-spacing:0.05em; color: ${good?'#4ee864':'#ff4f4f'}; font-weight:900;">${evaluationHeadline}</h3>
+            <p style="font-size:14px; text-align:center; line-height:1.5; margin-bottom:15px; color:rgba(255,255,255,0.85);">${evaluationSummaryText}</p>
+            <div class="kv">
+              <div class="kr"><b>Your Final Settlement Check:</b> ${fmt(deal)}</div>
+              <div class="kr"><b>Secret Prize Inside Your Case:</b> ${fmt(fValue)}</div>
+              <div class="kr"><b>Fair Statistical Value (EV):</b> ${fmt(e)}</div>
+              <div class="kr"><b>Banker Deal Efficiency Profile:</b> ${pct}% of EV Matrix</div>
+            </div>`;
+          
+          // Pop the modal after the visual reveal concludes
+          setTimeout(function() { $('endM').classList.remove('hidden'); }, 1800);
+      }, 650);
+  }, 2800);
 }
 
 function endNoDeal(swapped,fi,fv,ov,lo){
@@ -1265,7 +1297,7 @@ function confetti(){
 }
 
 // ═══════════════════════════════════════════════════
-//  MODAL SYSTEMS
+//  MODAL SYSTEM PRESENTERS
 // ═══════════════════════════════════════════════════
 $('evhBtn').addEventListener('click',function(){
   const r=remV(),sum=r.reduce((a,b)=>a+b,0),avg=r.length?sum/r.length:0;
@@ -1326,6 +1358,8 @@ document.querySelectorAll('.modal').forEach(m=>{
         if(e.target===m && m.id !== 'endM' && m.id !== 'welcomeM') m.classList.add('hidden');
     })
 });
+
+// Remove standard onload so it doesn't bypass the welcome modal
 </script>
 </body>
 </html>
